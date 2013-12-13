@@ -56,12 +56,12 @@ to parse and / or validate the route.
 
 ```js
 {
-  name: 'type'
-, name: ['type']
-, name: {
-    dataTypes: ['type1', 'type2']
+  one: 'array'
+, two: ['date', 'number']
+, three: {
+    dataTypes: ['string', 'number']
   , default: 20
-  , dataValues: [10, 20, 30]
+  , dataValues: [10, 'a', 30]
   }
 }
 ```

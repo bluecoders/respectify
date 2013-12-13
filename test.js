@@ -102,6 +102,19 @@ describe('Respectify Unit Tests', function() {
 
 
   describe('API', function() {
+    it('#template', function() {
+      var inst = new Respectify(server)
+
+      var tmpl = require('./lib/tmpl')
+        , fs = require('fs')
+        , src = fs.readFileSync(__dirname + '/lib/templates/spec.md', 'utf-8')
+        , specs = inst.loadSpecs()
+
+      var out = tmpl(src, {
+        specs: specs
+      })
+      fs.writeFileSync(__dirname + '/example/spec.md', out)
+    })
     it('#factory', function() {
       var inst = Respectify.factory(server)
       assert(inst instanceof Respectify)
