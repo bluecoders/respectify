@@ -1,0 +1,30 @@
+{
+  "name": "respectify"
+, "author": "Beau Sorensen <mail@beausorensen.com> (http://github.com/sorensen)"
+, "version": "0.0.1"
+, "license": "MIT"
+, "keywords": [
+    "restify"
+  , "specification"
+  ]
+, "description": "Restify specification tool"
+, "repository": {
+    "type": "git"
+  , "url": "git://github.com/majorleaguesoccer/respectify.git"
+  }
+, "engines": {
+    "node": "0.x"
+  }
+, "main": "index.js"
+, "scripts": {
+    "test": "mocha -R spec test.js"
+  }
+, "dependencies": {
+    "semver": "2.2.1"
+  , "restify": "2.3.4"
+  }
+, "devDependencies": {
+    "mocha": "1.8.1"
+  , "supertest" : "0.5.1"
+  }
+}
