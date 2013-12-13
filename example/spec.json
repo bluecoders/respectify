@@ -206,13 +206,15 @@
         "dataTypes": [
           "string"
         ],
-        "default": "baz"
+        "default": "baz",
+        "description": "Baz that string up"
       }
     ],
     "method": "GET",
     "versions": [
       "1.0.0"
-    ]
+    ],
+    "description": "This route is for getting all strings"
   },
   {
     "route": "/strings",

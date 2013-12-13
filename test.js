@@ -40,14 +40,21 @@ describe('Respectify Unit Tests', function() {
 
   }}, ok)
 
-  server.get({path: '/strings', version: '1.0.0', flags: 'i', params: {
-    foo: 'String'
-  , bar: ['string', 'STRING', 'string']
-  , baz: {
-      dataTypes: ['STRING']
-    , default: 'baz'
+  server.get({
+    path: '/strings'
+  , version: '1.0.0'
+  , flags: 'i'
+  , description: 'This route is for getting all strings'
+  , params: {
+      foo: 'String'
+    , bar: ['string', 'STRING', 'string']
+    , baz: {
+        dataTypes: ['STRING']
+      , default: 'baz'
+      , description: 'Baz that string up'
+      }
     }
-  }}, ok)
+  }, ok)
 
   server.get({path: '/strings', version: '2.0.0', flags: 'i', params: {
     cat: 'String'

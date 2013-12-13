@@ -1,48 +1,58 @@
-Routes
-------
+
+### Table of Contents
+
+-----
+
+* [Routes](#routes)
+  - [/](#)
+  - [/](#)
+  - [/arrays](#arrays)
+  - [/dates](#dates)
+  - [/numbers](#numbers)
+  - [/objects](#objects)
+  - [/strings](#strings)
+  - [/strings](#strings)
 
 
-### [/](#)
+### Routes
 
-Method: `GET`
+-----
 
+
+#### [/](#)
+
+Method: `GET`<br />
 Versions: `1.0.0`
 
-#### Parameters
+<br />
 
+#### [/](#)
 
-
-### [/](#)
-
-Method: `GET`
-
+Method: `GET`<br />
 Versions: `2.0.0`
 
-#### Parameters
+<br />
 
+#### [/arrays](#arrays)
 
-
-### [/arrays](#arrays)
-
-Method: `GET`
-
+Method: `GET`<br />
 Versions: `1.0.0`
 
-#### Parameters
+##### Parameters
 
 * `one` - (`array`) (optional)
 * `two` - (`array`) (optional)
 * `three` - (`array`) (optional, default `1,2,3`)
 * `four` - (`array`) (optional)
 
+<br />
 
-### [/dates](#dates)
+#### [/dates](#dates)
 
-Method: `GET`
-
+Method: `GET`<br />
 Versions: `1.0.0`
 
-#### Parameters
+##### Parameters
 
 * `one` - (`date`) (optional)
 * `two` - (`date`) (optional, default `02/20/2012 00:00:00 UTC`)
@@ -50,55 +60,62 @@ Versions: `1.0.0`
 * `four` - (`date`) (optional)
 * `five` - (`date`) (optional)
 
+<br />
 
-### [/numbers](#numbers)
+#### [/numbers](#numbers)
 
-Method: `GET`
-
+Method: `GET`<br />
 Versions: `1.0.0`
 
-#### Parameters
+##### Parameters
 
 * `one` - (`number`) (optional)
 * `two` - (`number`) (optional)
 * `three` - (`number`) (optional)
 * `four` - (`number`) (optional, default `function () { return 100 }`)
 
+<br />
 
-### [/objects](#objects)
+#### [/objects](#objects)
 
-Method: `GET`
-
+Method: `GET`<br />
 Versions: `1.0.0`
 
-#### Parameters
+##### Parameters
 
 * `one` - (`object`) (optional)
 * `two` - (`object`) (optional, default `[object Object]`)
 
+<br />
 
-### [/strings](#strings)
+#### [/strings](#strings)
 
-Method: `GET`
+This route is for getting all strings
 
+Method: `GET`<br />
 Versions: `1.0.0`
 
-#### Parameters
+##### Parameters
 
 * `foo` - (`string`) (optional)
 * `bar` - (`string`) (optional)
-* `baz` - (`string`) (optional, default `baz`)
+* `baz` - Baz that string up (`string`) (optional, default `baz`)
 
+<br />
 
-### [/strings](#strings)
+#### [/strings](#strings)
 
-Method: `GET`
-
+Method: `GET`<br />
 Versions: `2.0.0`
 
-#### Parameters
+##### Parameters
 
 * `cat` - (`string`) (optional)
 * `dog` - (`string`) (optional)
 * `monkey` - (`string`) (optional, default `baz`)
 
+<br />
+
+-----
+
+Generated on Fri, 13 Dec 2013 20:16:20 GMT
