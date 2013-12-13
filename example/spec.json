@@ -1,0 +1,251 @@
+[
+  {
+    "route": "/",
+    "parameters": [],
+    "method": "GET",
+    "versions": [
+      "1.0.0"
+    ]
+  },
+  {
+    "route": "/",
+    "parameters": [],
+    "method": "GET",
+    "versions": [
+      "2.0.0"
+    ]
+  },
+  {
+    "route": "/arrays",
+    "parameters": [
+      {
+        "name": "one",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "array"
+        ]
+      },
+      {
+        "name": "two",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "array"
+        ]
+      },
+      {
+        "name": "three",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "array"
+        ],
+        "default": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "name": "four",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "array"
+        ]
+      }
+    ],
+    "method": "GET",
+    "versions": [
+      "1.0.0"
+    ]
+  },
+  {
+    "route": "/dates",
+    "parameters": [
+      {
+        "name": "one",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "date"
+        ]
+      },
+      {
+        "name": "two",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "date"
+        ],
+        "default": "02/20/2012 00:00:00 UTC"
+      },
+      {
+        "name": "three",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "date"
+        ]
+      },
+      {
+        "name": "four",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "date"
+        ]
+      },
+      {
+        "name": "five",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "date"
+        ]
+      }
+    ],
+    "method": "GET",
+    "versions": [
+      "1.0.0"
+    ]
+  },
+  {
+    "route": "/numbers",
+    "parameters": [
+      {
+        "name": "one",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "number"
+        ]
+      },
+      {
+        "name": "two",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "number"
+        ]
+      },
+      {
+        "name": "three",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "number"
+        ]
+      },
+      {
+        "name": "four",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "number"
+        ]
+      }
+    ],
+    "method": "GET",
+    "versions": [
+      "1.0.0"
+    ]
+  },
+  {
+    "route": "/objects",
+    "parameters": [
+      {
+        "name": "one",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "object"
+        ]
+      },
+      {
+        "name": "two",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "object"
+        ],
+        "default": {
+          "def": "ault"
+        }
+      }
+    ],
+    "method": "GET",
+    "versions": [
+      "1.0.0"
+    ]
+  },
+  {
+    "route": "/strings",
+    "parameters": [
+      {
+        "name": "foo",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "string"
+        ]
+      },
+      {
+        "name": "bar",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "string"
+        ]
+      },
+      {
+        "name": "baz",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "string"
+        ],
+        "default": "baz"
+      }
+    ],
+    "method": "GET",
+    "versions": [
+      "1.0.0"
+    ]
+  },
+  {
+    "route": "/strings",
+    "parameters": [
+      {
+        "name": "cat",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "string"
+        ]
+      },
+      {
+        "name": "dog",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "string"
+        ]
+      },
+      {
+        "name": "monkey",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "string"
+        ],
+        "default": "baz"
+      }
+    ],
+    "method": "GET",
+    "versions": [
+      "2.0.0"
+    ]
+  }
+]

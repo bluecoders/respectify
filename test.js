@@ -67,7 +67,7 @@ describe('Respectify Unit Tests', function() {
     }
   , four: {
       dataTypes: ['NUMBER']
-    , default: 100
+    , default: function() { return 100 }
     }
   }}, ok)
 
@@ -114,6 +114,7 @@ describe('Respectify Unit Tests', function() {
       }
       var inst = new Respectify(server)
       var specs = inst.loadSpecs()
+      require('fs').writeFileSync(__dirname + '/example/spec.json', JSON.stringify(specs, null, 2))
       assert.strictEqual(specs.length, len)
     })
 
