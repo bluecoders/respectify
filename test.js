@@ -25,12 +25,19 @@ describe('Respectify Unit Tests', function() {
 
 
   describe('API', function() {
-    it('#factory', function() {
+    it('#factory()', function() {
       var inst = Respectify.factory(server)
       assert(inst instanceof Respectify)
     })
 
-    it('#loadSpecs', function() {
+    it('#getVersions()', function() {
+      var inst = new Respectify(server)
+      var versions = inst.getVersions()
+      assert.strictEqual(versions[0], '2.0.0')
+      assert.strictEqual(versions[1], '1.0.0')
+    })
+
+    it('#loadSpecs()', function() {
       var len = 0
       for (var prop in server.router.routes) {
         len += server.router.routes[prop].length
@@ -52,7 +59,7 @@ describe('Respectify Unit Tests', function() {
       assert.notDeepEqual(specs, specs2)
     })
 
-    it('#findRoutes', function() {
+    it('#findRoutes()', function() {
       var inst = new Respectify(server)
       var routes = inst.findRoutes('/')
       assert.strictEqual(routes.length, 2)
@@ -64,7 +71,7 @@ describe('Respectify Unit Tests', function() {
       assert.strictEqual(routes.length, 1)
     })
 
-    it('#getDefaults', function() {
+    it('#getDefaults()', function() {
       var inst = new Respectify(server)
       var defaults = inst.getDefaults('/strings', '2.0.0')
       assert.deepEqual(defaults, {
@@ -217,7 +224,6 @@ describe('Respectify Unit Tests', function() {
         request(server)
           .get('/numbers' + qs)
           .expect(409, function(err, res) {
-            console.log(res.body)
             assert.strictEqual(res.body.code, 'InvalidArgument')
             var msg = 'Invalid param `four`, value must be higher than `-10`, received `-11`'
             assert.strictEqual(res.body.message, msg)
@@ -233,7 +239,6 @@ describe('Respectify Unit Tests', function() {
         request(server)
           .get('/numbers' + qs)
           .expect(409, function(err, res) {
-            console.log(res.body)
             assert.strictEqual(res.body.code, 'InvalidArgument')
             var msg = 'Invalid param `three`, value must be lower than `200`, received `201`'
             assert.strictEqual(res.body.message, msg)
@@ -249,7 +254,6 @@ describe('Respectify Unit Tests', function() {
         request(server)
           .get('/numbers' + qs)
           .expect(409, function(err, res) {
-            console.log(res.body)
             assert.strictEqual(res.body.code, 'InvalidArgument')
             var msg = 'Invalid param `five`, value must be lower than `100`, received `101`'
             assert.strictEqual(res.body.message, msg)

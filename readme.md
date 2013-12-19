@@ -120,13 +120,21 @@ server.get({
 , version: '1.0.0'
 , params: {}
 }
-, respect.middleware()
+, respect.middleware
 , function(req, res, next) {
   
   // req.params has been cleaned and validated
 
 })
 ```
+
+### instance.getVersions()
+
+### instance.loadSpecs([version])
+
+### instance.findRoutes([version])
+
+### instance.getDefaults(route, [version])
 
 
 Install
