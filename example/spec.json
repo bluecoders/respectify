@@ -136,7 +136,8 @@
         "paramType": "querystring",
         "dataTypes": [
           "number"
-        ]
+        ],
+        "max": 200
       },
       {
         "name": "four",
@@ -144,7 +145,17 @@
         "paramType": "querystring",
         "dataTypes": [
           "number"
-        ]
+        ],
+        "min": -10
+      },
+      {
+        "name": "five",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "number"
+        ],
+        "max": 100
       }
     ],
     "method": "GET",
