@@ -51,17 +51,32 @@ A `params` object must be added to the route options in order for Respectify
 to parse and / or validate the route.
 
 * dataTypes - one of the following: `number`, `date`, `string`, `array`, `object`, `boolean`
-* default - the default value to use if the param was not sent
+* default - the default value to use if the param was not sent, functions can be used
 * dataValues - array of specific values considered valid
+* min - minimum value allowed (`number` type only)
+* max - maximum value allowed (`number` type only)
+* notes - array of string information about the param (useful for documentation)
+* desc - parameter description (useful for documentation)
 
 ```js
 {
-  one: 'array'
+  one: 'boolean'
 , two: ['date', 'number']
 , three: {
     dataTypes: ['string', 'number']
   , default: 20
   , dataValues: [10, 'a', 30]
+  }
+, pagesize: {
+    dataTypes: 'number'
+  , desc: 'page size'
+  , default: 50
+  , min: 0
+  , max: 250
+  }
+, random: {
+    dataTypes: 'number'
+  , default: function() { return Math.random() }
   }
 }
 ```
@@ -92,9 +107,12 @@ Route middleware to add parameter validation, this will filter all properties
 of `req.params` according to the param definition of the route.  Parameters received 
 that have not been defined will be removed.
 
+***Note:*** The middleware should come after `restify.queryParser`
+
 Example:
 
 ```js
+server.use(restify.queryParser())
 server.use(respect.middleware)
 
 server.get({
@@ -109,9 +127,6 @@ server.get({
 
 })
 ```
-
-###
-
 
 
 Install

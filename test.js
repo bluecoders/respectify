@@ -1,25 +1,16 @@
 'use strict'
 
 var restify = require('restify')
+  , fs = require('fs')
   , Respectify = require('./index')
   , assert = require('assert')
   , request = require('supertest')
   , toString = Object.prototype.toString
 
 describe('Respectify Unit Tests', function() {
-  var server = restify.createServer()
-    , respect = new Respectify(server)
-
-  server.use(restify.queryParser())
-  server.use(respect.middleware)
-
-  function ok(req, res, next) {
-    // Undefined params should always be filtered out
-    for (var prop in req.params) {
-      assert.notEqual(typeof req.params[prop], 'undefined')
-    }
-    res.send(req.params)
-  }
+  var example = require('./example/server')
+    , server = example.server
+    , respect = example.respect
 
   function queryString(obj) {
     var q = []
@@ -32,96 +23,8 @@ describe('Respectify Unit Tests', function() {
     return '?' + q.join('&')
   }
 
-  server.get({path: '/', version: '1.0.0', flags: 'i', params: {
-
-  }}, ok)
-
-  server.get({path: '/', version: '2.0.0', flags: 'i', params: {
-
-  }}, ok)
-
-  server.get({
-    path: '/strings'
-  , version: '1.0.0'
-  , flags: 'i'
-  , description: 'This route is for getting all strings'
-  , params: {
-      foo: 'String'
-    , bar: ['string', 'STRING', 'string']
-    , baz: {
-        dataTypes: ['STRING']
-      , default: 'baz'
-      , description: 'Baz that string up'
-      }
-    }
-  }, ok)
-
-  server.get({path: '/strings', version: '2.0.0', flags: 'i', params: {
-    cat: 'String'
-  , dog: ['string']
-  , monkey: {
-      dataTypes: ['STRING']
-    , default: 'baz'
-    }
-  }}, ok)
-
-  server.get({path: '/numbers', version: '1.0.0', flags: 'i', params: {
-    one: 'number'
-  , two: ['NumBer']
-  , three: {
-      dataTypes: ['number', 'Number']
-    , default: 0
-    }
-  , four: {
-      dataTypes: ['NUMBER']
-    , default: function() { return 100 }
-    }
-  }}, ok)
-
-  server.get({path: '/arrays', version: '1.0.0', flags: 'i', params: {
-    one: 'array'
-  , two: ['array']
-  , three: {
-      dataTypes: ['array']
-    , default: [1,2,3]
-    }
-  , four: ['array']
-  }}, ok)
-
-  server.get({path: '/objects', version: '1.0.0', flags: 'i', params: {
-    one: 'object'
-  , two: {
-      dataTypes: ['object']
-    , default: {def: 'ault'}
-    }
-  }}, ok)
-
-  server.get({path: '/dates', version: '1.0.0', flags: 'i', params: {
-    one: 'date'
-  , two: {
-      dataTypes: ['date']
-    , default: '02/20/2012 00:00:00 UTC'
-    }
-  , three: 'date'
-  , four: 'date'
-  , five: 'date'
-  }}, ok)
-
 
   describe('API', function() {
-    it('#template', function() {
-      var inst = new Respectify(server)
-
-      var tmpl = require('./lib/tmpl')
-        , fs = require('fs')
-        , src = fs.readFileSync(__dirname + '/lib/templates/spec.md', 'utf-8')
-        , specs = inst.loadSpecs()
-
-      var out = tmpl(src, {
-        specs: specs
-      })
-      fs.writeFileSync(__dirname + '/example/spec.md', out)
-    })
     it('#factory', function() {
       var inst = Respectify.factory(server)
       assert(inst instanceof Respectify)
@@ -134,7 +37,7 @@ describe('Respectify Unit Tests', function() {
       }
       var inst = new Respectify(server)
       var specs = inst.loadSpecs()
-      require('fs').writeFileSync(__dirname + '/example/spec.json', JSON.stringify(specs, null, 2))
+      fs.writeFileSync(__dirname + '/example/spec.json', JSON.stringify(specs, null, 2))
       assert.strictEqual(specs.length, len)
     })
 
@@ -266,7 +169,7 @@ describe('Respectify Unit Tests', function() {
           one: 1
         , two: 2
         , three: 3
-        , four: 4
+        , four: -10
         }
         var qs = queryString(obj)
         request(server)
@@ -302,6 +205,54 @@ describe('Respectify Unit Tests', function() {
           .get('/numbers' + qs)
           .expect(409, function(err, res) {
             assert.strictEqual(res.body.code, 'InvalidArgument')
+            done(err)
+          })
+      })
+
+      it('min', function(done) {
+        var obj = {
+          four: -11
+        }
+        var qs = queryString(obj)
+        request(server)
+          .get('/numbers' + qs)
+          .expect(409, function(err, res) {
+            console.log(res.body)
+            assert.strictEqual(res.body.code, 'InvalidArgument')
+            var msg = 'Invalid param `four`, value must be higher than `-10`, received `-11`'
+            assert.strictEqual(res.body.message, msg)
+            done(err)
+          })
+      })
+
+      it('max', function(done) {
+        var obj = {
+          three: 201
+        }
+        var qs = queryString(obj)
+        request(server)
+          .get('/numbers' + qs)
+          .expect(409, function(err, res) {
+            console.log(res.body)
+            assert.strictEqual(res.body.code, 'InvalidArgument')
+            var msg = 'Invalid param `three`, value must be lower than `200`, received `201`'
+            assert.strictEqual(res.body.message, msg)
+            done(err)
+          })
+      })
+
+      it('min & max', function(done) {
+        var obj = {
+          five: 101
+        }
+        var qs = queryString(obj)
+        request(server)
+          .get('/numbers' + qs)
+          .expect(409, function(err, res) {
+            console.log(res.body)
+            assert.strictEqual(res.body.code, 'InvalidArgument')
+            var msg = 'Invalid param `five`, value must be lower than `100`, received `101`'
+            assert.strictEqual(res.body.message, msg)
             done(err)
           })
       })
