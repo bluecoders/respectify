@@ -18,7 +18,10 @@ function ok(req, res, next) {
 }
 
 server.get({path: '/', version: '1.0.0', flags: 'i', params: {
-
+  foo: {
+    dataTypes: 'string'
+  , default: 'bar'
+  }
 }}, ok)
 
 server.get({path: '/', version: '2.0.0', flags: 'i', params: {

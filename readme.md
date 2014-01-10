@@ -1,19 +1,29 @@
 Respectify
 ==========
 
+> Route specification for [restify](http://mcavage.me/node-restify/)
+
 [![Build Status](https://secure.travis-ci.org/majorleaguesoccer/respectify.png)](http://travis-ci.org/majorleaguesoccer/respectify) 
 [![devDependency Status](https://david-dm.org/majorleaguesoccer/respectify.png)](https://david-dm.org/majorleaguesoccer/respectify#info=dependencies)
 [![NPM version](https://badge.fury.io/js/respectify.png)](http://badge.fury.io/js/respectify)
 
-Route specification for [restify](http://mcavage.me/node-restify/)
-
 
 ### Table of Contents
 
+* [Install](#install)
 * [Usage](#usage)
 * [API](#api)
-* [Install](#install)
 * [License](#license)
+
+
+Install
+-------
+
+With [npm](https://npmjs.org)
+
+```
+npm install respectify
+```
 
 
 Usage
@@ -37,7 +47,7 @@ server.get({
     }
   }
 }, function(req, res, next) {
-  ...
+  // ...
 })
  
 // Create the respectify instance with the new server
@@ -118,32 +128,112 @@ server.use(respect.middleware)
 server.get({
   path: '/'
 , version: '1.0.0'
-, params: {}
-}
-, respect.middleware
-, function(req, res, next) {
-  
-  // req.params has been cleaned and validated
+, params: {
+    foo: {
+      dataTypes: 'string'
+    , default: 'bar'
+    }
+  }
+}, function(req, res, next) {
+  res.send(200)
+})
 
+server.get({
+  path: '/'
+, version: '2.0.0'
+, params: {}
+}, function(req, res, next) {
+  res.send(200)
 })
 ```
 
 ### instance.getVersions()
 
+Returns an array of all routable versions found.
+
+
 ### instance.loadSpecs([version])
+
+* `version` - load only supplied version (optional, default latest version)
+
+```js
+var specs = instance.loadSpecs('1.0.0')
+```
+
+```json
+[
+  {
+    "route": "/",
+    "parameters": [
+      {
+        "name": "foo",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "string"
+        ],
+        "default": "bar"
+      }
+    ],
+    "method": "GET",
+    "versions": [
+      "1.0.0"
+    ]
+  }
+]
+```
 
 ### instance.findRoutes([version])
 
-### instance.getDefaults(route, [version])
+Find restify route objects, mainly used internally.
 
+* `version` - load only supplied version (optional, default latest version)
 
-Install
--------
-
-With [npm](https://npmjs.org)
-
+```js
+var routes = instance.findRoutes('/', '2.0.0')
 ```
-npm install respectify
+
+```json
+[
+  {
+    "name": "get200",
+    "method": "GET",
+    "path": {
+      "restifyParams": []
+    },
+    "spec": {
+      "path": "/",
+      "version": "2.0.0",
+      "params": {},
+      "method": "GET",
+      "versions": [
+        "2.0.0"
+      ],
+      "name": "get200"
+    },
+    "types": [],
+    "versions": [
+      "2.0.0"
+    ]
+  }
+]
+```
+
+### instance.getDefaults(path, [version])
+
+Find parameter defaults for a given route
+
+* `path` - route pathname as defined for restify
+* `version` - load only supplied version (optional, default latest version)
+
+```js
+var defaults = instance.getDefaults('/', '1.0.0')
+```
+
+```json
+{
+  "foo": "bar"
+}
 ```
 
 

@@ -23,7 +23,6 @@ describe('Respectify Unit Tests', function() {
     return '?' + q.join('&')
   }
 
-
   describe('API', function() {
     it('#factory()', function() {
       var inst = Respectify.factory(server)

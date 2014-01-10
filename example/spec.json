@@ -1,7 +1,17 @@
 [
   {
     "route": "/",
-    "parameters": [],
+    "parameters": [
+      {
+        "name": "foo",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "string"
+        ],
+        "default": "bar"
+      }
+    ],
     "method": "GET",
     "versions": [
       "1.0.0"
