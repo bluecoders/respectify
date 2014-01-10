@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var restify = require('restify')
   , fs = require('fs')

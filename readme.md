@@ -95,6 +95,10 @@ to parse and / or validate the route.
 API
 ---
 
+***Note:*** These methods are currently somewhat disorganized, as this module evolves, these 
+methods and their responses will be normalized and hopefully easier to use.
+
+
 ### new Respectify(server)
 
 Respectify constructor
@@ -183,10 +187,11 @@ var specs = instance.loadSpecs('1.0.0')
 ]
 ```
 
-### instance.findRoutes([version])
+### instance.findRoutes(path, [version])
 
 Find restify route objects, mainly used internally.
 
+* `path` - route pathname as defined for restify
 * `version` - load only supplied version (optional, default latest version)
 
 ```js
@@ -235,6 +240,24 @@ var defaults = instance.getDefaults('/', '1.0.0')
   "foo": "bar"
 }
 ```
+
+
+### instance.getSpecByRoute(route)
+
+Get the specification of a given restify route object. The route itself can be 
+retrieved using restify's `router.find()` method or the `instance.findRoutes()` 
+method above.
+
+See [route-information](./example/route-information.js) for example usage.
+
+* `route` - restify route object
+
+```js
+server.router.find(req, res, function(err, route, params) {
+  var spec = instance.getSpecByRoute(route)  
+})
+```
+
 
 
 License
