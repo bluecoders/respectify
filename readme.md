@@ -51,7 +51,7 @@ server.get({
 })
  
 // Create the respectify instance with the new server
-var respect = new Respectify(server)
+var respect = new Respectify(server, options)
  
 // Add the respectify middleware to validate routes
 server.use(respect.middleware)
@@ -99,13 +99,16 @@ API
 methods and their responses will be normalized and hopefully easier to use.
 
 
-### new Respectify(server)
+### new Respectify(server, options)
 
 Respectify constructor
 
 **Alias**: [`Respectify.factory(server)`]
 
 * `server` - restify server instance
+* `options` - respectify options
+  - `routeProperties` - array of route properties to store (optional, default `['description']`)
+  - `paramProperties` - array of route parameter properties to store (optional, default `['description']`)
 
 Example:
 

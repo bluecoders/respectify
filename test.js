@@ -193,7 +193,8 @@ describe('Respectify Unit Tests', function() {
           .get('/numbers' + qs)
           .expect(200, function(err, res) {
             assert.deepEqual(res.body, {
-              four: 100
+              three: 0
+            , four: 100
             })
             done(err)
           })

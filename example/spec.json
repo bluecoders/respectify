@@ -147,7 +147,8 @@
         "dataTypes": [
           "number"
         ],
-        "max": 200
+        "max": 200,
+        "default": 0
       },
       {
         "name": "four",
