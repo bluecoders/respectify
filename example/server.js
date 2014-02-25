@@ -30,7 +30,7 @@ server.get({path: '/', version: '2.0.0', flags: 'i', params: {
 
 server.get({
   path: '/strings'
-, version: '1.0.0'
+, versions: ['1.0.0', '3.0.0']
 , flags: 'i'
 , description: 'This route is for getting all strings'
 , params: {

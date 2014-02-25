@@ -234,7 +234,8 @@
     ],
     "method": "GET",
     "versions": [
-      "1.0.0"
+      "1.0.0",
+      "3.0.0"
     ],
     "description": "This route is for getting all strings"
   },

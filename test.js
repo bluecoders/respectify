@@ -32,8 +32,9 @@ describe('Respectify Unit Tests', function() {
     it('#getVersions()', function() {
       var inst = new Respectify(server)
       var versions = inst.getVersions()
-      assert.strictEqual(versions[0], '2.0.0')
-      assert.strictEqual(versions[1], '1.0.0')
+      assert.strictEqual(versions[0], '3.0.0')
+      assert.strictEqual(versions[1], '2.0.0')
+      assert.strictEqual(versions[2], '1.0.0')
     })
 
     it('#loadSpecs()', function() {
@@ -148,7 +149,7 @@ describe('Respectify Unit Tests', function() {
           .get('/strings' + qs)
           .expect(200, function(err, res) {
             assert.deepEqual(res.body, {
-              monkey: 'baz'
+              baz: 'baz'
             })
             done(err)
           })
