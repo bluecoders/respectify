@@ -12,7 +12,14 @@ Respectify
 
 * [Install](#install)
 * [Usage](#usage)
+* [Parameter Targeting](#parameter-targeting)
 * [API](#api)
+  - [getSpecByRoute]()
+  - [getDefaults]()
+  - [loadSpecs]()
+  - [findRoutes]()
+  - [find]()
+  - [getVersions]()
 * [License](#license)
 
 
@@ -66,7 +73,7 @@ to parse and / or validate the route.
 * min - minimum value allowed (`number` type only)
 * max - maximum value allowed (`number` type only)
 * notes - array of string information about the param (useful for documentation)
-* desc - parameter description (useful for documentation)
+* description - parameter description (useful for documentation)
 
 ```js
 {
@@ -91,6 +98,33 @@ to parse and / or validate the route.
 }
 ```
 
+Parameter Targeting
+-------------------
+
+By default, respectify will only use what has been populated in the `req.params` 
+object from restify, which should cover most use cases.  If you are using the restify 
+`queryParser` and / or `bodyParser`, restify will map these to the `req.params` 
+object (unless you specified `mapParams: false`)
+
+You can specify param targeting by passing a `paramTarget` option to the respectify 
+constructor, or by adding it as a route property, valid options are `query`, `params`, 
+and `body`.
+
+***Note:*** The original target object of the request, `params`, `body`, and `query` 
+may have its properties overritten or deleted by the `respectify.middleware`. If you 
+need the original values, you will need to use a middleware function to preserve them.
+
+```js
+// Shallow clone the `param` object to preserve original values
+server.use(function(req, res, next) {
+  req.__params = {}
+  for (var prop in req.params) {
+    req.__params[prop] = req.params[prop]
+  }
+})
+server.use(respectify.middleware)
+```
+
 
 API
 ---
@@ -109,6 +143,7 @@ Respectify constructor
 * `options` - respectify options
   - `routeProperties` - array of route properties to store (optional, default `['description']`)
   - `paramProperties` - array of route parameter properties to store (optional, default `['description']`)
+  - `paramTarget` - target for parameter extraction (optional, default `params`)
 
 Example:
 
@@ -124,7 +159,7 @@ Route middleware to add parameter validation, this will filter all properties
 of `req.params` according to the param definition of the route.  Parameters received 
 that have not been defined will be removed.
 
-***Note:*** The middleware should come after `restify.queryParser`
+***Note:*** The middleware should come after `restify.queryParser` and / or `restify.bodyParser`
 
 Example:
 
@@ -154,9 +189,40 @@ server.get({
 })
 ```
 
-### instance.getVersions()
 
-Returns an array of all routable versions found.
+### instance.getSpecByRoute(route)
+
+Get the specification of a given restify route object. The route itself can be 
+retrieved using restify's `router.find()` method or the `instance.findRoutes()` 
+method above.
+
+See [route-information](./example/route-information.js) for example usage.
+
+* `route` - restify route object
+
+```js
+server.router.find(req, res, function(err, route, params) {
+  var spec = instance.getSpecByRoute(route)  
+})
+```
+
+
+### instance.getDefaults(path, [version])
+
+Find parameter defaults for a given route
+
+* `path` - route pathname as defined for restify
+* `version` - load only supplied version (optional, default latest version)
+
+```js
+var defaults = instance.getDefaults('/', '1.0.0')
+```
+
+```json
+{
+  "foo": "bar"
+}
+```
 
 
 ### instance.loadSpecs([version])
@@ -227,39 +293,45 @@ var routes = instance.findRoutes('/', '2.0.0')
 ]
 ```
 
-### instance.getDefaults(path, [version])
+### instance.findSpecs(path, [version])
 
-Find parameter defaults for a given route
+Find restify route objects, mainly used internally.
+
+***Alias:*** [`find`]
 
 * `path` - route pathname as defined for restify
 * `version` - load only supplied version (optional, default latest version)
 
 ```js
-var defaults = instance.getDefaults('/', '1.0.0')
+var specs = instance.findSpecs('/', '2.0.0')
 ```
 
 ```json
-{
-  "foo": "bar"
-}
+[
+  {
+    "route": "/",
+    "parameters": [
+      {
+        "name": "foo",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "string"
+        ],
+        "default": "bar"
+      }
+    ],
+    "method": "GET",
+    "versions": [
+      "1.0.0"
+    ]
+  }
+]
 ```
 
+### instance.getVersions()
 
-### instance.getSpecByRoute(route)
-
-Get the specification of a given restify route object. The route itself can be 
-retrieved using restify's `router.find()` method or the `instance.findRoutes()` 
-method above.
-
-See [route-information](./example/route-information.js) for example usage.
-
-* `route` - restify route object
-
-```js
-server.router.find(req, res, function(err, route, params) {
-  var spec = instance.getSpecByRoute(route)  
-})
-```
+Returns an array of all routable versions found.
 
 
 
