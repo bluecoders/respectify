@@ -10,12 +10,10 @@ var assert = require('assert')
   , server = restify.createServer()
 
 // Create the respectify instance with default parameters
-var respect = new Respectify(server, {
-
-})
+var respect = new Respectify(server)
 
 server.use(restify.queryParser())
-server.use(respect.middleware)
+server.use(respect.middleware())
 
 function ok(req, res, next) {
   // Undefined params should always be filtered out
