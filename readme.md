@@ -111,7 +111,7 @@ constructor, or by adding it as a route property, valid options are `query`, `pa
 and `body`.
 
 ***Note:*** The original target object of the request, `params`, `body`, and `query` 
-may have its properties overritten or deleted by the `respectify.middleware`. If you 
+may have its properties overwitten or deleted by the `respectify.middleware`. If you 
 need the original values, you will need to use a middleware function to preserve them.
 
 ```js
