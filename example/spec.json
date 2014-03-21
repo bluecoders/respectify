@@ -228,8 +228,8 @@
         "dataTypes": [
           "string"
         ],
-        "default": "baz",
-        "description": "Baz that string up"
+        "description": "Baz that string up",
+        "default": "baz"
       }
     ],
     "method": "GET",

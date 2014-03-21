@@ -1,10 +1,18 @@
 'use strict';
 
+/*!
+ * Module dependencies.
+ */
+
 var assert = require('assert')
   , restify = require('restify')
   , Respectify = require('../index')
   , server = restify.createServer()
-  , respect = new Respectify(server)
+
+// Create the respectify instance with default parameters
+var respect = new Respectify(server, {
+
+})
 
 server.use(restify.queryParser())
 server.use(respect.middleware)
@@ -101,6 +109,10 @@ server.get({path: '/dates', version: '1.0.0', flags: 'i', params: {
 , four: 'date'
 , five: 'date'
 }}, ok)
+
+/*!
+ * Module exports.
+ */
 
 module.exports.server = server
 module.exports.respect = respect
