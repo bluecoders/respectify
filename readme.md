@@ -153,13 +153,17 @@ var respect = new Respectify(server)
 ```
 
 
-### instance.middleware
+### instance.middleware([options])
 
 Route middleware to add parameter validation, this will filter all properties 
 of `req.params` according to the param definition of the route.  Parameters received 
 that have not been defined will be removed.
 
 ***Note:*** The middleware should come after `restify.queryParser` and / or `restify.bodyParser`
+
+* `options` - middleware options (optional)
+  - `mapParams` - map all parsed `query` and `body` properties to the `params` object (optional, default `true`)
+  - `filterParams` - remove all unspecified input params (optional, default `true`)
 
 Example:
 
@@ -340,7 +344,7 @@ License
 
 (The MIT License)
 
-Copyright (c) 2013 Major League Soccer
+Copyright (c) 2014 Major League Soccer
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
