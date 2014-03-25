@@ -6,6 +6,7 @@
 , "keywords": [
     "restify"
   , "specification"
+  , "sanitization"
   ]
 , "description": "Restify specification tool"
 , "repository": {
@@ -17,7 +18,8 @@
   }
 , "main": "index.js"
 , "scripts": {
-    "test": "mocha -R spec test.js"
+    "test": "./node_modules/mocha/bin/mocha -R spec test.js"
+  , "hint": "jshint *.js lib/*.js example/*.js --extra-ext .json"
   }
 , "dependencies": {
     "semver": "2.2.1"
