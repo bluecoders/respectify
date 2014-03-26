@@ -210,7 +210,7 @@ describe('Respectify Unit Tests', function() {
           .get('/strings' + qs)
           .expect(200, function(err, res) {
             assert.deepEqual(res.body, {
-              baz: 'baz'
+              monkey: 'baz'
             })
             done(err)
           })

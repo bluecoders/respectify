@@ -27,6 +27,6 @@
 , "devDependencies": {
     "mocha": "1.8.1"
   , "supertest" : "0.5.1"
-  , "restify": "2.3.4"
+  , "restify": "2.6.3"
   }
 }
