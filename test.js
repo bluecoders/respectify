@@ -34,12 +34,12 @@ describe('Respectify Unit Tests', function() {
   }
 
   describe('API', function() {
-    it('#factory()', function() {
+    it('factory()', function() {
       var inst = Respectify.factory(server)
       assert(inst instanceof Respectify)
     })
 
-    it('#getVersions()', function() {
+    it('getVersions()', function() {
       var inst = new Respectify(server)
       var versions = inst.getVersions()
       ase(versions[0], '3.0.0')
@@ -47,7 +47,52 @@ describe('Respectify Unit Tests', function() {
       ase(versions[2], '1.0.0')
     })
 
-    it('#loadSpecs()', function() {
+    it('validateTarget()', function() {
+      var inst = new Respectify(server)
+      assert.throws(function() {
+        inst.validateTarget('foobar')
+      }, Error)
+
+      inst.validateTarget('body')
+      inst.validateTarget('params')
+      inst.validateTarget('query')
+    })
+
+    it('normalizeParamFilter()', function() {
+      var inst = new Respectify(server)
+
+      it('string', function() {
+        assert.throws(function() {
+          inst.normalizeParamFilter('foobar')
+        }, Error)
+
+        var filter = inst.normalizeParamFilter('body')
+        assert(Array.isArray(filter))
+        ase(filter[0], 'body')
+      })
+
+      it('array', function() {
+        assert.throws(function() {
+          inst.normalizeParamFilter(['body', 'query', 'meowmeowbeanz'])
+        }, Error)
+
+        var filter = inst.normalizeParamFilter(['body', 'params'])
+        assert(Array.isArray(filter))
+        ase(filter[0], 'body')
+        ase(filter[1], 'params')
+      })
+
+      it('boolean', function() {
+        var filter = inst.normalizeParamFilter(true)
+        assert(Array.isArray(filter))
+        ase(filter.length, 3)
+
+        var filter = inst.normalizeParamFilter(false)
+        ase(filter, false)
+      })
+    })
+
+    it('loadSpecs()', function() {
       var len = 0
       for (var prop in server.router.routes) {
         len += server.router.routes[prop].length
@@ -58,7 +103,7 @@ describe('Respectify Unit Tests', function() {
       ase(specs.length, len)
     })
 
-    it('#loadSpecs(version)', function() {
+    it('loadSpecs(version)', function() {
       var inst = new Respectify(server)
       var specs = inst.loadSpecs('1.0.0')
       ase(specs.length, 6)
@@ -69,7 +114,7 @@ describe('Respectify Unit Tests', function() {
       assert.notDeepEqual(specs, specs2)
     })
 
-    it('#findSpecs(path, version)', function() {
+    it('findSpecs(path, version)', function() {
       var inst = new Respectify(server)
 
       var spec = inst.findSpecs('/', '1.0.0')
@@ -114,25 +159,25 @@ describe('Respectify Unit Tests', function() {
       })
     })
 
-    it('#findRoutes()', function() {
+    it('findRoutes()', function() {
       var inst = new Respectify(server)
       var routes = inst.findRoutes('/')
       ase(routes.length, 2)
     })
 
-    it('#middleware()', function() {
+    it('middleware()', function() {
       var inst = new Respectify(server)
       var middle = inst.middleware()
       ase(typeof middle, 'function')
     })
 
-    it('#findRoutes(path, version)', function() {
+    it('findRoutes(path, version)', function() {
       var inst = new Respectify(server)
       var routes = inst.findRoutes('/', '1.0.0')
       ase(routes.length, 1)
     })
 
-    it('#getDefaults()', function() {
+    it('getDefaults()', function() {
       var inst = new Respectify(server)
       var defaults = inst.getDefaults('/strings', '2.0.0')
       assert.deepEqual(defaults, {
@@ -547,29 +592,63 @@ describe('Respectify Unit Tests', function() {
         dataType: 'string'
       }
     }
+
     it('enabled', function(done) {
       var server = restify.createServer()
       var respect = new Respectify(server)
       server.use(restify.queryParser({ mapParams: true }))
       server.use(respect.middleware({ filterParams: true }))
       
-      server.get({path: '/test', version: '1.0.0'
+      server.get({path: '/test/:value', version: '1.0.0'
       , params: params
       }, send)
 
       request(server)
-        .get('/test?bar=hello&invalid=20')
+        .get('/test/hi?bar=hello&invalid=20')
         .expect(200, function(err, res) {
           ase(err, null)
+          ase(res.body.params.value, 'hi')
+
           ase(res.body.query.bar, 'hello')
-          ase(res.body.query.foo, undefined)
-          ase(res.body.query.cat, undefined)
-          ase(res.body.query.invalid, undefined)
+
+          assert(!res.body.query.hasOwnProperty('foo'))
+          assert(!res.body.query.hasOwnProperty('cat'))
+          assert(!res.body.query.hasOwnProperty('invalid'))
 
           ase(res.body.params.bar, 'hello')
-          ase(res.body.params.foo, undefined)
-          ase(res.body.params.cat, undefined)
-          ase(res.body.params.invalid, undefined)
+          assert(!res.body.params.hasOwnProperty('foo'))
+          assert(!res.body.params.hasOwnProperty('cat'))
+          assert(!res.body.params.hasOwnProperty('invalid'))
+          done(err)
+        })
+    })
+
+    it('custom', function(done) {
+      var server = restify.createServer()
+      var respect = new Respectify(server)
+      server.use(restify.queryParser({ mapParams: true }))
+      server.use(respect.middleware({ filterParams: ['params'] }))
+      
+      server.get({path: '/test/:value', version: '1.0.0'
+      , params: params
+      }, send)
+
+      request(server)
+        .get('/test/stuff?bar=hello&invalid=20')
+        .expect(200, function(err, res) {
+          ase(err, null)
+          ase(res.body.params.value, 'stuff')
+
+          ase(res.body.query.bar, 'hello')
+          ase(res.body.query.invalid, '20')
+          assert(!res.body.query.hasOwnProperty('foo'))
+          assert(!res.body.query.hasOwnProperty('cat'))
+
+
+          ase(res.body.params.bar, 'hello')
+          assert(!res.body.params.hasOwnProperty('foo'))
+          assert(!res.body.params.hasOwnProperty('cat'))
+          assert(!res.body.params.hasOwnProperty('invalid'))
           done(err)
         })
     })
@@ -580,14 +659,16 @@ describe('Respectify Unit Tests', function() {
       server.use(restify.queryParser({ mapParams: true }))
       server.use(respect.middleware({ filterParams: false }))
       
-      server.get({path: '/test', version: '1.0.0'
+      server.get({path: '/test/:value', version: '1.0.0'
       , params: params
       }, send)
 
       request(server)
-        .get('/test?bar=hello&invalid=20')
+        .get('/test/code?bar=hello&invalid=20')
         .expect(200, function(err, res) {
           ase(err, null)
+          ase(res.body.params.value, 'code')
+
           ase(res.body.query.bar, 'hello')
           ase(res.body.query.invalid, '20')
 
@@ -595,7 +676,96 @@ describe('Respectify Unit Tests', function() {
           ase(res.body.params.invalid, '20')
           done(err)
         })
+    })
+
+    it('whitelist', function(done) {
+      var server = restify.createServer()
+      var respect = new Respectify(server)
+      server.use(restify.queryParser({ mapParams: true }))
+
+      assert.throws(function() {
+        server.use(respect.middleware({ paramWhitelist: 'meow' }))
+      }, Error)
+
+      assert.throws(function() {
+        server.use(respect.middleware({ paramWhitelist: 22 }))
+      }, Error)
+
+      server.use(respect.middleware({ 
+        filterParams: true
+      , paramWhitelist: ['meowmeow', 'beanz'] 
+      }))
       
+      server.get({path: '/test', version: '1.0.0'
+      , params: params
+      }, send)
+
+      request(server)
+        .get('/test?foo=hello&invalid=20&meowmeow=2&beanz=3')
+        .expect(200, function(err, res) {
+          ase(err, null)
+
+          ase(res.body.query.foo, 'hello')
+          ase(res.body.query.meowmeow, '2')
+          ase(res.body.query.beanz, '3')
+          assert(!res.body.query.hasOwnProperty('invalid'))
+
+          ase(res.body.params.foo, 'hello')
+          ase(res.body.params.meowmeow, '2')
+          ase(res.body.params.beanz, '3')
+          assert(!res.body.params.hasOwnProperty('invalid'))
+          done(err)
+        })
+    })
+
+
+    it('jsonp', function() {
+      var server = restify.createServer()
+      var respect = new Respectify(server)
+
+      server.use(restify.queryParser({ mapParams: true }))
+      server.use(respect.middleware({ 
+        filterParams: true
+      , jsonp: true 
+      }))
+
+      server.get({path: '/foo', version: '1.0.0'
+      , params: params
+      }, send)
+
+      it('jsonp', function(done) {
+        request(server)
+          .get('/foo?bar=hello&invalid=20&jsonp')
+          .expect(200, function(err, res) {
+            ase(err, null)
+
+            ase(res.body.query.bar, 'hello')
+            ase(res.body.query.jsonp, '')
+
+            assert(!res.body.query.hasOwnProperty('invalid'))
+
+            ase(res.body.params.bar, 'hello')
+            assert(!res.body.params.hasOwnProperty('invalid'))
+            done(err)
+          })
+      })
+
+      it('callback', function(done) {
+        request(server)
+          .get('/foo?bar=hello&invalid=20&callback=jsonp1396552205550')
+          .expect(200, function(err, res) {
+            ase(err, null)
+
+            ase(res.body.query.bar, 'hello')
+            ase(res.body.query.callback, 'jsonp1396552205550')
+
+            assert(!res.body.query.hasOwnProperty('invalid'))
+
+            ase(res.body.params.bar, 'hello')
+            assert(!res.body.params.hasOwnProperty('invalid'))
+            done(err)
+          })
+      })
     })
   })
 
