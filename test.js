@@ -215,6 +215,81 @@ describe('Respectify Unit Tests', function() {
             done(err)
           })
       })
+
+      it('transforms', function(done) {
+        var server = restify.createServer()
+        var respect = new Respectify(server)
+        server.use(restify.queryParser({ mapParams: true }))
+        server.use(respect.middleware())
+
+        server.get({path: '/transform/:things', version: '1.0.0'
+        , params: {
+            things: {
+              dataTypes: 'number'
+            , transform: function(val) {
+                return val * 10
+              }
+            }
+          , foo: {
+              dataTypes: 'string'
+            , transform: function(val) {
+                return val.toUpperCase()
+              }
+            }
+          }
+        }, send)
+
+        request(server)
+          .get('/transform/1?foo=bar')
+          .expect(200, function(err, res) {
+            ase(err, null)
+            ase(res.body.params.foo, 'BAR')
+            ase(res.body.params.things, 10)
+            done(err)
+          })
+      })
+    })
+
+    describe('Validation', function() {
+      var server = restify.createServer()
+      var respect = new Respectify(server)
+      server.use(restify.queryParser({ mapParams: true }))
+      server.use(respect.middleware())
+
+      server.get({path: '/validate/:things', version: '1.0.0'
+      , params: {
+          things: {
+            dataTypes: 'number'
+          , validate: function(val) {
+              if (val % 10 !== 0) {
+                return new restify.InvalidArgumentError('Not divisible by 10')
+              }
+              return false
+            }
+          }
+        }
+      }, send)
+
+      it('valid', function(done) {
+        request(server)
+          .get('/validate/10')
+          .expect(200, function(err, res) {
+            ase(err, null)
+            ase(res.body.params.things, 10)
+            done(err)
+          })
+      })
+
+      it('invalid', function(done) {
+        request(server)
+          .get('/validate/5')
+          .expect(409, function(err, res) {
+            ase(err, null)
+            ase(res.body.code, 'InvalidArgument')
+            ase(res.body.message, 'Not divisible by 10')
+            done(err)
+          })
+      })
     })
 
     describe('String', function() {
