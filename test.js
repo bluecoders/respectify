@@ -199,6 +199,10 @@ describe('Respectify Unit Tests', function() {
         , description: 'new desc'
         , default: 1
         }
+      }, {
+        another: {
+          dataTypes: ['date']
+        }
       })
       
       ade(params, {
@@ -223,6 +227,9 @@ describe('Respectify Unit Tests', function() {
       , hello: {
           dataTypes: 'string'
         , description: 'hiii'
+        }
+      , another: {
+          dataTypes: ['date']
         }
       })
     })

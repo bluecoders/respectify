@@ -343,7 +343,7 @@ Returns an array of all routable versions found.
 
 ### instance.getRouteParams(path, [version])
 
-Get a ***copy*** of the parameters for a given route.
+Get a ***copy*** of the parameters for a given route as a key value mapping.
 
 * `path` - route pathname as defined for restify
 * `version` - load only supplied version (optional, default latest version)
@@ -367,7 +367,7 @@ var params = instance.getRouteParams('/', '2.0.0')
 }
 ```
 
-### instance.getMergedParams(path, version, params)
+### instance.getMergedParams(path, version, params, ...)
 
 Get a merged ***copy*** of the route parameterss found with parameters given. 
 This is primarily a shortcut method for creating new routes while building upon 
@@ -375,6 +375,7 @@ the previously defined parameters.
 
 * `path` - route pathname as defined for restify
 * `version` - load only supplied version (optional, default latest version)
+* `params` - any number of parameter objects to merge
 
 ```js
 var params = instance.getMergedParams('/', '2.0.0', {
