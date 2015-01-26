@@ -1,7 +1,7 @@
 {
   "name": "respectify"
 , "author": "Beau Sorensen <mail@beausorensen.com> (http://github.com/sorensen)"
-, "version": "1.0.10"
+, "version": "1.1.0"
 , "license": "MIT"
 , "keywords": [
     "restify"
@@ -23,10 +23,11 @@
   }
 , "dependencies": {
     "semver": "2.2.1"
+  , "underscore": "1.7.0"
   }
 , "devDependencies": {
     "mocha": "1.8.1"
   , "supertest" : "0.5.1"
-  , "restify": "2.6.3"
+  , "restify": "2.8.5"
   }
 }

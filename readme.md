@@ -14,12 +14,16 @@ Respectify
 * [Usage](#usage)
 * [Parameter Targeting](#parameter-targeting)
 * [API](#api)
-  - [getSpecByRoute]()
-  - [getDefaults]()
-  - [loadSpecs]()
-  - [findRoutes]()
-  - [find]()
-  - [getVersions]()
+  - [constructor](#new-respectifyserver-options)
+  - [middleware](#instancemiddlewareoptions)
+  - [getSpecByRoute](#instancegetspecbyrouteroute)
+  - [getDefaults](#instancegetdefaultspath-version)
+  - [loadSpecs](#instanceloadspecsversion)
+  - [findRoutes](#instancefindroutespath-version)
+  - [findSpecs](#instancefindspecspath-version)
+  - [getVersions](#instancegetversions)
+  - [getRouteParams](#instancegetrouteparamspath-version)
+  - [getMergedParams](#instancegetmergedparamspath-version-params)
 * [License](#license)
 
 
@@ -336,6 +340,70 @@ var specs = instance.findSpecs('/', '2.0.0')
 ### instance.getVersions()
 
 Returns an array of all routable versions found.
+
+### instance.getRouteParams(path, [version])
+
+Get a ***copy*** of the parameters for a given route.
+
+* `path` - route pathname as defined for restify
+* `version` - load only supplied version (optional, default latest version)
+
+```js
+var params = instance.getRouteParams('/', '2.0.0')
+```
+
+```json
+{
+  "foo": {
+      "name": "foo",
+      "required": false,
+      "paramType": "querystring",
+      "dataTypes": [
+        "string"
+      ],
+      "default": "bar"
+    }
+  }
+}
+```
+
+### instance.getMergedParams(path, version, params)
+
+Get a merged ***copy*** of the route parameterss found with parameters given. 
+This is primarily a shortcut method for creating new routes while building upon 
+the previously defined parameters.
+
+* `path` - route pathname as defined for restify
+* `version` - load only supplied version (optional, default latest version)
+
+```js
+var params = instance.getMergedParams('/', '2.0.0', {
+  pagesize: {
+    dataTypes: 'number'
+  , description: 'Page size'
+  }
+})
+```
+
+```json
+{
+  "foo": {
+      "name": "foo",
+      "required": false,
+      "paramType": "querystring",
+      "dataTypes": [
+        "string"
+      ],
+      "default": "bar"
+    }
+  },
+  "pagesize": {
+      "dataTypes": "number",
+      "description": "Page size"
+    }
+  }
+}
+```
 
 
 

@@ -7,6 +7,7 @@ var restify = require('restify')
   , request = require('supertest')
   , toString = Object.prototype.toString
   , ase = assert.strictEqual
+  , ade = assert.deepEqual
 
 describe('Respectify Unit Tests', function() {
   var example = require('./example/server')
@@ -119,7 +120,7 @@ describe('Respectify Unit Tests', function() {
 
       var spec = inst.findSpecs('/', '1.0.0')
       
-      assert.deepEqual(spec,  {
+      ade(spec,  {
         route: '/',
         parameters: [{
           name: 'foo',
@@ -133,7 +134,7 @@ describe('Respectify Unit Tests', function() {
       })
       var spec2 = inst.findSpecs('/strings', '*')
       
-      assert.deepEqual(spec2,  {
+      ade(spec2,  {
         route: '/strings',
         parameters: [{
           name: 'foo',
@@ -156,6 +157,73 @@ describe('Respectify Unit Tests', function() {
         method: 'GET',
         versions: ['3.0.0', '1.0.0'],
         description: 'This route is for getting all strings'
+      })
+    })
+
+    it('getRouteParams()', function() {
+      var inst = new Respectify(server)
+      var params = inst.getRouteParams('/strings', '3.0.0')
+      ade(params, {
+        foo: {
+          name: 'foo',
+          required: false,
+          paramType: 'querystring',
+          dataTypes: ['string']
+        }
+      , bar: {
+          name: 'bar',
+          required: false,
+          paramType: 'querystring',
+          dataTypes: ['string']
+      }
+      , baz: {
+          name: 'baz',
+          required: false,
+          paramType: 'querystring',
+          dataTypes: ['string'],
+          description: 'Baz that string up',
+          default: 'baz'
+        }
+      })
+    })
+
+    it('getMergedParams()', function() {
+      var inst = new Respectify(server)
+      var params = inst.getMergedParams('/strings', '3.0.0', {
+        hello: {
+          dataTypes: 'string'
+        , description: 'hiii'
+        }
+      , baz: {
+          dataTypes: 'number'
+        , description: 'new desc'
+        , default: 1
+        }
+      })
+      
+      ade(params, {
+        foo: {
+          name: 'foo',
+          required: false,
+          paramType: 'querystring',
+          dataTypes: ['string']
+        }
+      , bar: {
+          name: 'bar',
+          required: false,
+          paramType: 'querystring',
+          dataTypes: ['string']
+        }
+        // Param overwrites, should not have normalized data
+      , baz: {
+          dataTypes: 'number',
+          description: 'new desc',
+          default: 1
+        }
+      , hello: {
+          dataTypes: 'string'
+        , description: 'hiii'
+        }
       })
     })
 
@@ -330,7 +398,7 @@ describe('Respectify Unit Tests', function() {
           .get('/strings' + qs)
           .expect(200, function(err, res) {
             assert.deepEqual(res.body, {
-              monkey: 'baz'
+              baz: 'baz'
             })
             done(err)
           })
