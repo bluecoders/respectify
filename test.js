@@ -414,14 +414,14 @@ describe('Respectify Unit Tests', function() {
       it('invalid', function(done) {
         var qs = queryString({
           foo: 1
-        , bar: '{"a": "b"}'
         , baz: true
-        })
+        }) + '&bar=2&bar=3';
+
         request(server)
           .get('/strings' + qs)
           .set('x-api-version', '1.0.0')
-          .expect(200, function(err, res) {
-            done()
+          .expect(409, function(err, res) {
+            done(err)
           })
       })
     })
