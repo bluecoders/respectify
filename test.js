@@ -546,7 +546,7 @@ describe('Respectify Unit Tests', function() {
           .get('/dates' + qs)
           .expect(200, function(err, res) {
             assert.deepEqual(res.body, {
-              two: '02/20/2012 00:00:00 UTC'
+              two: '2012-02-20T00:00:00.000Z'
             })
             done(err)
           })

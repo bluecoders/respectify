@@ -101,7 +101,7 @@ server.get({path: '/dates', version: '1.0.0', flags: 'i', params: {
   one: 'date'
 , two: {
     dataTypes: ['date']
-  , default: '02/20/2012 00:00:00 UTC'
+  , default: '02/20/2012 00:00:00 UTC' // This should get cast to an actual date
   }
 , three: 'date'
 , four: 'date'
