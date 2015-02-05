@@ -3,6 +3,7 @@
 var restify = require('restify')
   , fs = require('fs')
   , Respectify = require('./index')
+  , info = require('./package.json')
   , assert = require('assert')
   , request = require('supertest')
   , toString = Object.prototype.toString
@@ -107,7 +108,7 @@ describe('Respectify Unit Tests', function() {
     it('loadSpecs(version)', function() {
       var inst = new Respectify(server)
       var specs = inst.loadSpecs('1.0.0')
-      ase(specs.length, 6)
+      ase(specs.length, 7)
 
       var specs2 = inst.loadSpecs('2.0.0')
       ase(specs2.length, 2)
@@ -367,6 +368,52 @@ describe('Respectify Unit Tests', function() {
       })
     })
 
+    /*!
+     * Routing booleans
+     */
+
+    describe('Booleans', function() {
+      it('empty', function(done) {
+        request(server)
+          .get('/booleans?one=&two=')
+          .expect(200, function(err, res) {
+            assert.deepEqual(res.body, {
+              bad: false
+            , ok: true
+            , one: true
+            })
+            done(err)
+          })
+      })
+
+      it('defaults', function(done) {
+        request(server)
+          .get('/booleans')
+          .expect(200, function(err, res) {
+            assert.deepEqual(res.body, {
+              bad: false
+            , ok: true
+            })
+            done(err)
+          })
+      })
+
+      it('invalid', function(done) {
+        request(server)
+          .get('/booleans?one=abc')
+          .expect(409, function(err, res) {
+            ase(err, null)
+            ase(res.body.code, 'InvalidArgument')
+            assert(!~~res.body.message, 'Invalid param `one`')
+            done(err)
+          })
+      })
+    })
+
+    /*!
+     * Routing strings
+     */
+
     describe('String', function() {
       it('empty', function(done) {
         request(server)
@@ -425,6 +472,10 @@ describe('Respectify Unit Tests', function() {
           })
       })
     })
+
+    /*!
+     * Routing numbers
+     */
 
     describe('Numbers', function() {
       it('valid', function(done) {
@@ -519,6 +570,10 @@ describe('Respectify Unit Tests', function() {
       })
     })
 
+    /*!
+     * Routing dates
+     */
+
     describe('Dates', function() {
       it('valid', function(done) {
         var obj = {
@@ -565,6 +620,10 @@ describe('Respectify Unit Tests', function() {
           })
       })
     })
+
+    /*!
+     * Routing objects
+     */
 
     describe('Objects', function() {
       it('valid', function(done) {
@@ -624,12 +683,16 @@ describe('Respectify Unit Tests', function() {
       })
     })
 
+    /*!
+     * Routing arrays
+     */
+
     describe('Arrays', function() {
       it('valid', function(done) {
         var obj = {
           one: 'one,two,three'
-        , two: ['one', 'two', 'three']
-        , three: 'one'
+        , two: ['true', 'false']
+        , three: '5,6,3'
         , four: JSON.stringify(['one', 'two', 'three'])
         }
         var qs = queryString(obj)
@@ -638,8 +701,8 @@ describe('Respectify Unit Tests', function() {
           .expect(200, function(err, res) {
             assert.deepEqual(res.body, {
               one: ['one', 'two', 'three']
-            , two: ['one', 'two', 'three']
-            , three: ['one']
+            , two: [true, false]
+            , three: [5,6,3]
             , four: ['one', 'two', 'three']
             })
             done(err)
@@ -1031,5 +1094,567 @@ describe('Respectify Unit Tests', function() {
           done(err)
         })
     })
-  })
+  }) // End routing
+
+  describe('Validation', function() {
+    var inv = Respectify.isInvalid
+    //restify.InvalidArgumentError
+
+    function errTest(obj, prop, paramSpec) {
+      var err = inv(obj, prop, paramSpec)
+      assert(err instanceof restify.InvalidArgumentError)
+      ase(err.statusCode, 409)
+      assert(!!~err.message.indexOf('Invalid param `' + prop))
+    }
+
+    /*!
+     * Boolean validation
+     */
+
+    describe('Booleans', function() {
+      it('conversions', function() {
+        var paramSpec = {
+          dataTypes: ['boolean']
+        }
+
+        // Empty
+        assert.ifError(inv({}, 'on', paramSpec))
+
+        // Truth tests
+        var obj = { on: '1' }
+        assert.ifError(inv(obj, 'on', paramSpec))
+        ase(obj.on, true)
+        
+        var obj = { on: 1 }
+        assert.ifError(inv(obj, 'on', paramSpec))
+        ase(obj.on, true)
+        
+        var obj = { on: 'TRue' }
+        assert.ifError(inv(obj, 'on', paramSpec))
+        ase(obj.on, true)
+        
+        var obj = { on: true }
+        assert.ifError(inv(obj, 'on', paramSpec))
+        ase(obj.on, true)
+        
+        var obj = { on: undefined }
+        assert.ifError(inv(obj, 'on', paramSpec))
+        ase(obj.on, true)
+        
+        var obj = { on: '' }
+        assert.ifError(inv(obj, 'on', paramSpec))
+        ase(obj.on, true)
+        
+        // False tests
+        var obj = { off: '0' }
+        assert.ifError(inv(obj, 'off', paramSpec))
+        ase(obj.off, false)
+        
+        // False tests
+        var obj = { off: 'faLSE' }
+        assert.ifError(inv(obj, 'off', paramSpec))
+        ase(obj.off, false)
+        
+        // False tests
+        var obj = { off: 0 }
+        assert.ifError(inv(obj, 'off', paramSpec))
+        ase(obj.off, false)
+        
+        // False tests
+        var obj = { off: false }
+        assert.ifError(inv(obj, 'off', paramSpec))
+        ase(obj.off, false)
+
+        // Test lists
+        var paramSpec = {
+          dataTypes: ['boolean', 'array']
+        }
+
+        // Truth tests
+        var obj = { on: ['1', 'TRUE', 1, true, undefined, ''] }
+        assert.ifError(inv(obj, 'on', paramSpec))
+        ade(obj.on, [true, true, true, true, true, true])
+
+        var obj = { off: ['0', 'false', 0, false, '1'] }
+        assert.ifError(inv(obj, 'off', paramSpec))
+        ade(obj.off, [false, false, false, false, true])
+      })
+
+      it('dataValues', function() {
+        var paramSpec = {
+          dataTypes: ['boolean']
+        , dataValues: [true]
+        }
+        
+        var obj = { on: 1 }
+        assert.ifError(inv(obj, 'on', paramSpec))
+        ase(obj.on, true)
+
+        var paramSpec = {
+          dataTypes: ['boolean']
+        , dataValues: [false]
+        }
+        var obj = { off: false }
+        assert.ifError(inv(obj, 'off', paramSpec))
+        ase(obj.off, false)
+
+        var paramSpec = {
+          dataTypes: ['boolean']
+        , dataValues: [false, true]
+        }
+        var obj = { on: 1 }
+        assert.ifError(inv(obj, 'on', paramSpec))
+        ase(obj.on, true)
+
+        var obj = { off: false }
+        assert.ifError(inv(obj, 'off', paramSpec))
+        ase(obj.off, false)
+      })
+
+      it('errors', function() {
+        var paramSpec = {
+          dataTypes: ['boolean']
+        }
+
+        errTest({ bad: 'abc' }, 'bad', paramSpec)
+        errTest({ bad: '10' }, 'bad', paramSpec)
+        errTest({ bad: '00.0' }, 'bad', paramSpec)
+        errTest({ bad: '1.001' }, 'bad', paramSpec)
+        errTest({ bad: 1.001 }, 'bad', paramSpec)
+        errTest({ bad: 20 }, 'bad', paramSpec)
+        errTest({ bad: [] }, 'bad', paramSpec)
+
+
+        var paramSpec = {
+          dataTypes: ['boolean']
+        , dataValues: [false]
+        }
+        errTest({ bad: true }, 'bad', paramSpec)
+        errTest({ bad: '1' }, 'bad', paramSpec)
+        errTest({ bad: 'true' }, 'bad', paramSpec)
+
+
+        var paramSpec = {
+          dataTypes: ['boolean']
+        , dataValues: [true]
+        }
+        errTest({ bad: false }, 'bad', paramSpec)
+        errTest({ bad: '0' }, 'bad', paramSpec)
+        errTest({ bad: 'false' }, 'bad', paramSpec)
+        
+      })
+    })
+
+    /*!
+     * String validation
+     */
+
+    describe('Strings', function() {
+      it('conversions', function() {
+        var paramSpec = {
+          dataTypes: ['string']
+        }
+        
+        // Empty
+        assert.ifError(inv({}, 'str', paramSpec))
+
+        // Truth tests
+        var obj = { str: '1' }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ase(obj.str, '1')
+
+        var obj = { str: 'abc' }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ase(obj.str, 'abc')
+
+        var obj = { str: '{woa nelly}' }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ase(obj.str, '{woa nelly}')
+
+        var obj = { str: undefined }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ase(obj.str, '')
+
+        // List
+        var paramSpec = {
+          dataTypes: ['string', 'array']
+        }
+        
+        var obj = { str: 'a,b,c' }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ade(obj.str, ['a','b','c'])
+        
+        var obj = { str: '["a","b","c"]' }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ade(obj.str, ['a','b','c'])
+        
+        var obj = { str: ['hey', 'there'] }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ade(obj.str, ['hey', 'there'])
+        
+        var obj = { str: 'a' }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ase(obj.str, 'a')
+      })
+
+      it('dataValues', function() {
+        var paramSpec = {
+          dataTypes: ['string']
+        , dataValues: ['a', 'b', 'c']
+        }
+        
+        // Truth tests
+        var obj = { str: 'a' }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ase(obj.str, 'a')
+
+        var obj = { str: 'b' }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ase(obj.str, 'b')
+
+
+        var paramSpec = {
+          dataTypes: ['string', 'array']
+        , dataValues: ['a', 'b', 'c']
+        }
+        var obj = { str: 'a,b,c' }
+        assert.ifError(inv(obj, 'str', paramSpec))
+        ade(obj.str, ['a', 'b', 'c'])
+      })
+
+      it('errors', function() {
+        var paramSpec = {
+          dataTypes: ['string']
+        }
+        errTest({ str: 1 }, 'str', paramSpec)
+        errTest({ str: [] }, 'str', paramSpec)
+        errTest({ str: true }, 'str', paramSpec)
+        errTest({ str: { oh: 'hi' } }, 'str', paramSpec)
+        errTest({ str: new Date() }, 'str', paramSpec)
+
+        var paramSpec = {
+          dataTypes: ['string']
+        , dataValues: ['a', 'b', 'c']
+        }
+        errTest({ str: 'd' }, 'str', paramSpec)
+        errTest({ str: 'a,b,c' }, 'str', paramSpec)
+      })
+    })
+
+    /*!
+     * Number validation
+     */
+
+    describe('Numbers', function() {
+      it('conversions', function() {
+        var paramSpec = {
+          dataTypes: ['number']
+        }
+        
+        // Empty
+        assert.ifError(inv({}, 'num', paramSpec))
+
+        var obj = { num: '1' }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ase(obj.num, 1)
+        
+        var obj = { num: '1.02' }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ase(obj.num, 1.02)
+        
+        var obj = { num: '0' }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ase(obj.num, 0)
+        
+        var obj = { num: 20 }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ase(obj.num, 20)
+        
+        var obj = { num: '9.99999999999999' }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ase(obj.num, 9.99999999999999)
+
+        // List
+        var paramSpec = {
+          dataTypes: ['number', 'array']
+        }
+        
+        var obj = { num: '1,2,3' }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ade(obj.num, [1, 2, 3])
+
+        var obj = { num: ['1', '2'] }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ade(obj.num, [1, 2])
+
+        var obj = { num: [30, 21] }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ade(obj.num, [30, 21])
+      })
+
+      it('dataValues', function() {
+        var paramSpec = {
+          dataTypes: ['number']
+        , dataValues: [1, 2, 3.33]
+        }
+        
+        var obj = { num: '1' }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ase(obj.num, 1)
+
+        var obj = { num: 3.33 }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ase(obj.num, 3.33)
+
+        // List
+        var paramSpec = {
+          dataTypes: ['number', 'array']
+        , dataValues: [1, 2, 3.33]
+        }
+
+        var obj = { num: 3.33 }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ase(obj.num, 3.33)
+
+        var obj = { num: '3.33, 2' }
+        assert.ifError(inv(obj, 'num', paramSpec))
+        ade(obj.num, [3.33, 2])
+      })
+
+      it('errors', function() {
+        var paramSpec = {
+          dataTypes: ['number']
+        }
+        errTest({ num: 'a' }, 'num', paramSpec)
+        errTest({ num: 'true' }, 'num', paramSpec)
+        errTest({ num: '10x4' }, 'num', paramSpec)
+        errTest({ num: true }, 'num', paramSpec)
+        errTest({ num: new Date() }, 'num', paramSpec)
+        errTest({ num: [] }, 'num', paramSpec)
+        errTest({ num: [1] }, 'num', paramSpec)
+        errTest({ num: {hey: 'there'} }, 'num', paramSpec)
+
+        var paramSpec = {
+          dataTypes: ['number']
+        , dataValues: [1, 2, 3.33]
+        }
+        errTest({ num: 1.5 }, 'num', paramSpec)
+      })
+    })
+
+    /*!
+     * Date validation
+     */
+
+    describe('Dates', function() {
+      var t = 1423170463349 // 2014-02-05
+        , d = new Date(t)
+
+      it('conversions', function() {
+        var paramSpec = {
+          dataTypes: ['date']
+        }
+        
+        // Empty
+        assert.ifError(inv({}, 'time', paramSpec))
+
+        var obj = { time: t + '' }
+        assert.ifError(inv(obj, 'time', paramSpec))
+        assert(obj.time instanceof Date)
+        ase(+obj.time, 1423170463349)
+
+        var obj = { time: Math.round(t / 1000) }
+        assert.ifError(inv(obj, 'time', paramSpec))
+        assert(obj.time instanceof Date)
+        ase(+obj.time, 1423170463000)
+
+        ;['2015/02/05'
+        , '2015-02-05'
+        , '02-05-2015'
+        , '02/05/2015'
+        , '02/05/2015 00:00'
+        , '02-05-2015 00:00'
+        , '02-05-2015 00:00:00'
+        , '02-05-2015 00:00:00 -0800'
+        ].forEach(function(x) {
+          var obj = { time: x }
+          assert.ifError(inv(obj, 'time', paramSpec))
+          assert(obj.time instanceof Date)
+          ase(+obj.time, 1423094400000)
+        })
+
+        var paramSpec = {
+          dataTypes: ['date', 'array']
+        }
+        var obj = { time: [t, Math.round(t / 1000), d] }
+        assert.ifError(inv(obj, 'time', paramSpec))
+        ade(
+          obj.time.map(function(x) { return +x })
+        , [1423170463349, 1423170463000, 1423170463349]
+        )
+      })
+
+      // Data values will not work with dates...
+      // it('dataValues', function() {
+      // })
+
+      it('errors', function() {
+        var paramSpec = {
+          dataTypes: ['date']
+        }
+        errTest({ time: 1 }, 'time', paramSpec)
+        errTest({ time: 'abc' }, 'time', paramSpec)
+        errTest({ time: 103230 }, 'time', paramSpec)
+        errTest({ time: true }, 'time', paramSpec)
+        errTest({ time: 'true' }, 'time', paramSpec)
+        errTest({ time: [] }, 'time', paramSpec)
+        errTest({ time: [1423094400000] }, 'time', paramSpec)
+        errTest({ time: {hi: 1423094400000} }, 'time', paramSpec)
+      })
+    })
+
+    /*!
+     * Array validation
+     */
+
+    describe('Arrays', function() {
+      it('conversions', function() {
+        var paramSpec = {
+          dataTypes: ['array']
+        }
+        
+        // Empty
+        assert.ifError(inv({}, 'arr', paramSpec))
+
+        var obj = { arr: '1' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, ['1'])
+
+        var obj = { arr: '1,2,3' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, ['1', '2', '3'])
+
+        var obj = { arr: 1 }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, [1])
+
+        var obj = { arr: true }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, [true])
+
+        var obj = { arr: ['1', '2']}
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, ['1', '2'])
+
+        var obj = { arr: '["1",2,3]' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, ['1', 2, 3])
+
+        // Mixed types
+        var paramSpec = {
+          dataTypes: ['array', 'string']
+        }
+        var obj = { arr: '1' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ase(obj.arr, '1')
+
+        var obj = { arr: 'a,b,2' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, ['a', 'b', '2'])
+
+        var obj = { arr: '1,2,3' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, ['1', '2', '3'])
+        
+
+        var paramSpec = {
+          dataTypes: ['array', 'number']
+        }
+        var obj = { arr: 1 }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ase(obj.arr, 1)
+
+        var obj = { arr: '1,2,2' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, [1, 2, 2])
+
+        var obj = { arr: [2, 3] }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, [2, 3])
+
+        var paramSpec = {
+          dataTypes: ['array', 'number', 'string']
+        }
+        var obj = { arr: '1' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, 1)
+
+        var obj = { arr: 'a,b,2' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, ['a', 'b', 2])
+
+        var obj = { arr: ['hey', 'there'] }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, ['hey', 'there'])
+      })
+
+      // Direct data values don't apply, mixed type data values 
+      // with array should be tested by the other data types
+
+      it('errors', function() {
+        var paramSpec = {
+          dataTypes: ['array']
+        }
+        errTest({ arr: '[1,2' }, 'arr', paramSpec)
+
+        var paramSpec = {
+          dataTypes: ['array', 'string']
+        }
+
+        errTest({ arr: 1 }, 'arr', paramSpec)
+
+        var paramSpec = {
+          dataTypes: ['array', 'number']
+        }
+        errTest({ arr: 'a' }, 'arr', paramSpec)
+        errTest({ arr: 'a,b,c' }, 'arr', paramSpec)
+      })
+    })
+
+    /*!
+     * Object validation
+     */
+
+    describe('Objects', function() {
+      it('conversions', function() {
+        var paramSpec = {
+          dataTypes: ['object']
+        }
+        
+        // Empty
+        assert.ifError(inv({}, 'hash', paramSpec))
+
+        var obj = { hash: '{"hey": 1}' }
+        assert.ifError(inv(obj, 'hash', paramSpec))
+        ade(obj.hash, { hey: 1 })
+
+        var big = JSON.stringify(info)
+        var obj = { hash: big }
+        assert.ifError(inv(obj, 'hash', paramSpec))
+        ade(obj.hash, info)
+      })
+
+      it('errors', function() {
+        var paramSpec = {
+          dataTypes: ['object']
+        }
+        errTest({ hash: 1 }, 'hash', paramSpec)
+        errTest({ hash: 'a' }, 'hash', paramSpec)
+        errTest({ hash: '{"hey":2' }, 'hash', paramSpec)
+        errTest({ hash: [1, 2] }, 'hash', paramSpec)
+        errTest({ hash: true }, 'hash', paramSpec)
+        errTest({ hash: 'false' }, 'hash', paramSpec)
+      })
+    })
+  }) // End validation
 })

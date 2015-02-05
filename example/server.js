@@ -79,11 +79,27 @@ server.get({path: '/numbers', version: '1.0.0', flags: 'i', params: {
   }
 }}, ok)
 
+
+server.get({path: '/booleans', version: '1.0.0', flags: 'i', params: {
+  one: 'boolean'
+, list: {
+    dataTypes: ['array', 'boolean']
+  }
+, bad: {
+    dataTypes: ['boolean']
+  , default: false
+  }
+, ok: {
+    dataTypes: ['boolean']
+  , default: function() { return true }
+  }
+}}, ok)
+
 server.get({path: '/arrays', version: '1.0.0', flags: 'i', params: {
   one: 'array'
-, two: ['array']
+, two: ['array', 'boolean']
 , three: {
-    dataTypes: ['array']
+    dataTypes: ['array', 'number']
   , default: [1,2,3]
   }
 , four: ['array']

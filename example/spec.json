@@ -41,7 +41,8 @@
         "required": false,
         "paramType": "querystring",
         "dataTypes": [
-          "array"
+          "array",
+          "boolean"
         ]
       },
       {
@@ -49,7 +50,8 @@
         "required": false,
         "paramType": "querystring",
         "dataTypes": [
-          "array"
+          "array",
+          "number"
         ],
         "default": [
           1,
@@ -63,6 +65,49 @@
         "paramType": "querystring",
         "dataTypes": [
           "array"
+        ]
+      }
+    ],
+    "method": "GET",
+    "versions": [
+      "1.0.0"
+    ]
+  },
+  {
+    "route": "/booleans",
+    "parameters": [
+      {
+        "name": "one",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "list",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "array",
+          "boolean"
+        ]
+      },
+      {
+        "name": "bad",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "boolean"
+        ],
+        "default": false
+      },
+      {
+        "name": "ok",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "boolean"
         ]
       }
     ],
