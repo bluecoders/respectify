@@ -377,6 +377,7 @@ describe('Respectify Unit Tests', function() {
         request(server)
           .get('/booleans?one=&two=')
           .expect(200, function(err, res) {
+
             assert.deepEqual(res.body, {
               bad: false
             , ok: true
@@ -643,6 +644,42 @@ describe('Respectify Unit Tests', function() {
           })
       })
 
+      it('nested', function(done) {
+        var qs = '?nested[cat][name]=fluffy&nested[hasPets]=1'
+        
+        request(server)
+          .get('/objects' + qs)
+          .expect(200, function(err, res) {
+            assert.deepEqual(res.body, {
+              nested: {
+                cat: {
+                  name: 'fluffy'
+                , lives: 9
+                }
+              , hasPets: true
+              }
+            , two: {def: 'ault'}
+            })
+            done(err)
+          })
+      })
+
+      it('nested', function(done) {
+        var qs = '?nested[hasPets]=true'
+        
+        request(server)
+          .get('/objects' + qs)
+          .expect(200, function(err, res) {
+            assert.deepEqual(res.body, {
+              nested: {
+                hasPets: true
+              }
+            , two: {def: 'ault'}
+            })
+            done(err)
+          })
+      })
+
       it('defaults', function(done) {
         var obj = {}
         var qs = queryString(obj)
@@ -695,7 +732,9 @@ describe('Respectify Unit Tests', function() {
         , three: '5,6,3'
         , four: JSON.stringify(['one', 'two', 'three'])
         }
+        // ?one=one,two,three&two=true,false&three=5,6,3&four=["one","two","three"]'
         var qs = queryString(obj)
+
         request(server)
           .get('/arrays' + qs)
           .expect(200, function(err, res) {
@@ -1096,15 +1135,27 @@ describe('Respectify Unit Tests', function() {
     })
   }) // End routing
 
-  describe('Validation', function() {
+  describe('Param Validation', function() {
     var inv = Respectify.isInvalid
-    //restify.InvalidArgumentError
 
     function errTest(obj, prop, paramSpec) {
-      var err = inv(obj, prop, paramSpec)
-      assert(err instanceof restify.InvalidArgumentError)
-      ase(err.statusCode, 409)
-      assert(!!~err.message.indexOf('Invalid param `' + prop))
+      var errs = inv(obj, prop, paramSpec)
+
+      if (!Array.isArray(errs)) errs = [errs]
+      
+      errs.forEach(function(err) {
+        assert(
+          err instanceof restify.InvalidArgumentError
+          || err instanceof restify.MissingParameterError
+        , 'Invalid error type: ' + err)
+        ase(err.statusCode, 409)
+
+        if (err instanceof restify.InvalidArgumentError) {
+          assert(!!~err.message.indexOf('Invalid param `' + prop))
+        } else {
+          assert(!!~err.message.indexOf('Param `' + prop))
+        }
+      })
     }
 
     /*!
@@ -1552,6 +1603,14 @@ describe('Respectify Unit Tests', function() {
 
         // Mixed types
         var paramSpec = {
+          dataTypes: ['array', 'boolean']
+        }
+        var obj = { arr: 'true,false' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, [true, false])
+
+
+        var paramSpec = {
           dataTypes: ['array', 'string']
         }
         var obj = { arr: '1' }
@@ -1642,6 +1701,115 @@ describe('Respectify Unit Tests', function() {
         var obj = { hash: big }
         assert.ifError(inv(obj, 'hash', paramSpec))
         ade(obj.hash, info)
+
+        // Sub-schema params
+        var paramSpec = {
+          dataTypes: ['object']
+          
+          // This needs to be normalized
+        , params: [
+            {
+              dataTypes: ['boolean']
+            , name: 'one'
+            }
+          , {
+              dataTypes: ['number']
+            , default: 2
+            , name: 'two'
+            }
+          , {
+              dataTypes: ['object']
+            , name: 'three'
+
+              // This needs to be normalized
+            , params: [
+                {
+                  name: 'a'
+                , dataTypes: ['string']
+                }
+                // This param should be required *only* if the parent 
+                // parameter is sent, as it is not required
+              , {
+                  dataTypes: ['number']
+                , name: 'b'
+                , required: true
+                }
+              , {
+                  dataTypes: ['string']
+                , name: 'c'
+
+                  // This should only be here if the parent object exists
+                , default: 'abc'
+                }
+              ]
+            }
+          ]
+        }
+        var obj = {
+          hash: {
+            one: true
+          , three: {
+              b: 2
+            }
+          }
+        }
+        assert.ifError(inv(obj, 'hash', paramSpec))
+        ade(obj.hash, { 
+          one: true
+        , two: 2
+        , three: {
+            b: 2
+          , c: 'abc'
+          }
+        })
+
+        var obj = {
+          hash: {
+            one: false
+          , two: 5
+          }
+        }
+        assert.ifError(inv(obj, 'hash', paramSpec))
+        ade(obj.hash, { 
+          one: false
+        , two: 5
+        })
+      })
+
+      it('transforms', function() {
+        var paramSpec = {
+          dataTypes: ['object']
+        , name: 'hash'
+        , transform: function(val, req, param) {
+            // In this context no request was used.
+            assert(typeof req === 'undefined')
+            ase(param.name, 'hash')
+            return { c: val.a + val.b }
+          }
+        }
+
+        var obj = { hash: { a: 1, b: 2 } }
+        assert.ifError(inv(obj, 'hash', paramSpec))
+        ade(obj.hash, { c: 3 })
+      })
+
+      it('custom validate', function() {
+        var paramSpec = {
+          dataTypes: ['object']
+        , name: 'hash'
+        , validate: function(val, req, param) {
+            // In this context no request was used.
+            if (val.a !== 1) return new Error('Not one')
+          }
+        }
+
+        var obj = { hash: { a: 1, b: 2 } }
+        assert.ifError(inv(obj, 'hash', paramSpec))
+        ade(obj.hash, { a: 1, b: 2 })
+
+        var obj = { hash: { a: 4 } }
+        var err = inv(obj, 'hash', paramSpec)
+        ade(err.message, 'Not one')
       })
 
       it('errors', function() {
@@ -1654,6 +1822,57 @@ describe('Respectify Unit Tests', function() {
         errTest({ hash: [1, 2] }, 'hash', paramSpec)
         errTest({ hash: true }, 'hash', paramSpec)
         errTest({ hash: 'false' }, 'hash', paramSpec)
+
+        // Sub-schema params
+        var paramSpec = {
+          dataTypes: ['object']
+          
+          // This needs to be normalized
+        , params: [
+            {
+              dataTypes: ['boolean']
+            , name: 'one'
+            }
+          , {
+              dataTypes: ['number']
+            , default: 2
+            , name: 'two'
+            }
+          , {
+              dataTypes: ['object']
+            , name: 'three'
+
+              // This needs to be normalized
+            , params: [
+                {
+                  name: 'a'
+                , dataTypes: ['string']
+                }
+                // This param should be required *only* if the parent 
+                // parameter is sent, as it is not required
+              , {
+                  dataTypes: ['number']
+                , name: 'b'
+                , required: true
+                }
+              , {
+                  dataTypes: ['string']
+                , name: 'c'
+
+                  // This should only be here if the parent object exists
+                , default: function(req, param) {
+                    // In this context no request was used.
+                    assert(typeof req === 'undefined')
+                    ase(param.name, 'c')
+                    return 'abc'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        errTest({ hash: { one: 50 } }, 'hash', paramSpec)
+        errTest({ hash: { three: { a: 'a' } } }, 'hash', paramSpec)
       })
     })
   }) // End validation

@@ -240,6 +240,51 @@
         "default": {
           "def": "ault"
         }
+      },
+      {
+        "name": "nested",
+        "required": false,
+        "paramType": "querystring",
+        "dataTypes": [
+          "object"
+        ],
+        "params": [
+          {
+            "name": "cat",
+            "required": false,
+            "paramType": "querystring",
+            "dataTypes": [
+              "object"
+            ],
+            "params": [
+              {
+                "name": "name",
+                "required": false,
+                "paramType": "querystring",
+                "dataTypes": [
+                  "string"
+                ]
+              },
+              {
+                "name": "lives",
+                "required": false,
+                "paramType": "querystring",
+                "dataTypes": [
+                  "number"
+                ],
+                "default": 9
+              }
+            ]
+          },
+          {
+            "name": "hasPets",
+            "required": false,
+            "paramType": "querystring",
+            "dataTypes": [
+              "boolean"
+            ]
+          }
+        ]
       }
     ],
     "method": "GET",
