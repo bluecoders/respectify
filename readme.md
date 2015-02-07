@@ -12,6 +12,7 @@ Respectify
 
 * [Install](#install)
 * [Usage](#usage)
+* [Parameters](#parameters)
 * [Parameter Targeting](#parameter-targeting)
 * [API](#api)
   - [constructor](#new-respectifyserver-options)
@@ -24,6 +25,7 @@ Respectify
   - [getVersions](#instancegetversions)
   - [getRouteParams](#instancegetrouteparamspath-version)
   - [getMergedParams](#instancegetmergedparamspath-version-params)
+* [Debugging](#debugging)
 * [License](#license)
 
 
@@ -67,6 +69,10 @@ var respect = new Respectify(server, options)
 // Add the respectify middleware to validate routes
 server.use(respect.middleware)
 ```
+
+
+Parameters
+----------
 
 A `params` object must be added to the route options in order for Respectify 
 to parse and / or validate the route.
@@ -132,7 +138,7 @@ Parameter specific validation method, returns `false` if valid, or any
 
 Example:
 
-```
+```js
 server.get({path: '/users'
 , versions: ['2.0.0']
 , flags: 'i'
@@ -197,6 +203,73 @@ server.get({path: '/users'
     }
   }
 })
+```
+
+## Special Cases
+
+### Arrays
+
+If `array` is used as a dataType, the elements of array will be re-validated against 
+the remaining dataTypes.
+
+For example, a parameter defined with both `array` and `number` is interpreted to 
+be either a single number value, or an array of numbers.
+
+```js
+{
+  ids: {
+    dataTypes: ['array', 'number']
+  }
+}
+```
+
+```js
+// http://localhost/users?id=1
+req.params.id === 1
+
+// http://localhost/users?id=1,2,3
+req.params.id === [1, 2, 3]
+
+// http://localhost/users?id=10&id=40
+req.params.id === [10, 40]
+```
+
+### Objects
+
+If using `object` as a dataType, a nested `params` definition may be added to 
+specify property values. When using `required` on a nested parameter definition, 
+only the current object level is looked at. 
+
+```js
+{
+  user: {
+    dataTypes: ['object']
+  , params: {
+      id: 'number'
+    , email: {
+        dataTypes: ['string']
+
+        // This will only be required if the `user` param is sent.
+      , required: true
+      }
+    , name: {
+        dataTypes: ['object']
+      , params: {
+          first: {
+            dataTypes: 'string'
+          }
+        , last: {
+            dataTypes: 'string'
+
+            // This parameter is only required if `name` is sent, because 
+            // the parent parameter is not required. 
+          , required: true
+          }
+        }
+      }
+    }
+  }
+}
 ```
 
 
@@ -503,6 +576,13 @@ var params = instance.getMergedParams('/', '2.0.0', {
   }
 }
 ```
+
+
+Debugging
+---------
+
+This project uses the [debug](https://github.com/visionmedia/debug) module for 
+logging, and can be activated using `DEBUG=respectify` or `DEBUG=respectify:verbose`
 
 
 
