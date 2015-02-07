@@ -111,6 +111,26 @@ server.get({path: '/objects', version: '1.0.0', flags: 'i', params: {
     dataTypes: ['object']
   , default: {def: 'ault'}
   }
+, nested: {
+    dataTypes: ['object']
+  , params: {
+      cat: {
+        dataTypes: ['object']
+      , params: {
+          name: {
+            dataTypes: ['string']
+          }
+        , lives: {
+            dataTypes: ['number']
+          , default: 9
+          }
+        }
+      }
+    , hasPets: {
+        dataTypes: ['boolean']
+      }
+    }
+  }
 }}, ok)
 
 server.get({path: '/dates', version: '1.0.0', flags: 'i', params: {
