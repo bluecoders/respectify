@@ -71,36 +71,134 @@ server.use(respect.middleware)
 A `params` object must be added to the route options in order for Respectify 
 to parse and / or validate the route.
 
-* dataTypes - one of the following: `number`, `date`, `string`, `array`, `object`, `boolean`
-* default - the default value to use if the param was not sent, functions can be used
-* dataValues - array of specific values considered valid
-* min - minimum value allowed (`number` type only)
-* max - maximum value allowed (`number` type only)
-* notes - array of string information about the param (useful for documentation)
-* description - parameter description (useful for documentation)
+* `dataTypes` - one of the following: `number`, `date`, `string`, `array`, `object`, `boolean`
+* `default` - the default value to use if the param was not sent, functions can be used
+* `dataValues` - array of specific values considered valid
+* `min` - minimum value allowed (`number` type only)
+* `max` - maximum value allowed (`number` type only)
+* `notes` - array of string information about the param (useful for documentation)
+* `description` - parameter description (useful for documentation)
+* `transform` - param value transformation function (synchronous, optional)
+* `validate` - param value validation function (synchronous, optional)
 
 ```js
-{
-  one: 'boolean'
-, two: ['date', 'number']
-, three: {
-    dataTypes: ['string', 'number']
-  , default: 20
-  , dataValues: [10, 'a', 30]
+server.get({
+  path: '/users/:id'
+, version: '1.0.0'
+, params: {
+    one: 'boolean'
+  , two: ['date', 'number']
+  , three: {
+      dataTypes: ['string', 'number']
+    , default: 20
+    , dataValues: [10, 'a', 30]
+    , transform: function(val, req, param) {
+        if (val === 'a') return 20
+        return val
+      }
+    }
+  , pagesize: {
+      dataTypes: 'number'
+    , desc: 'page size'
+    , default: 50
+    , min: 0
+    , max: 250
+    }
+  , random: {
+      dataTypes: 'number'
+    , default: function() { return Math.round(Math.random()) }
+    , validate: function(val, req, param) {
+        if (val === 10) {
+          return new Error('i hate that number')
+        }
+        return false
+      }
+    }
   }
-, pagesize: {
-    dataTypes: 'number'
-  , desc: 'page size'
-  , default: 50
-  , min: 0
-  , max: 250
-  }
-, random: {
-    dataTypes: 'number'
-  , default: function() { return Math.random() }
-  }
-}
+}, function(req, res, next) {
+  // ...
+})
 ```
+
+
+### param.validate(value, req, param)
+
+Parameter specific validation method, returns `false` if valid, or any 
+`Error` instance for failures. Synchronous.
+
+* `value` - incoming request value, after initial validation
+* `req` - restify request object
+* `param` - normalized parameter reference
+
+Example:
+
+```
+server.get({path: '/users'
+, versions: ['2.0.0']
+, flags: 'i'
+, params: {
+    pagesize: {
+      dataTypes: 'number'
+    , description: 'page size'
+    , default: 50
+    , min: 1
+    , max: 1000
+    , validate: function(val, req) {
+        var ttl = req.params.ttl;
+        if (val && +val > 200 && (!ttl || +ttl < 1800)) {
+          var msg = ''
+            + 'Invalid param `pagesize`, value must be under `200`'
+            + ' if no `ttl` was provided, or if `ttl` is less than `1800`'
+            ;
+          return new restify.InvalidArgumentError(msg);
+        }
+        return false;
+      }
+    , notes: [
+        'if a value of over `200` is used, a `ttl` value of `1800` or more must also be used'
+      ]
+    }
+  }
+})
+```
+
+
+### param.transform(value, req, param)
+
+Parameter specific transform method. This value returned from this method will 
+always be used, even if `undefined` returned. Synchronous.
+
+* `value` - incoming request value, after initial validation
+* `req` - restify request object
+* `param` - normalized parameter reference
+
+Example:
+
+```js
+SQL_SORT_MAP = {
+  asc:        'ASC'
+, acending:   'ASC'
+, desc:       'DESC'
+, descending: 'DESC'
+};
+
+server.get({path: '/users'
+, versions: ['2.0.0']
+, flags: 'i'
+, params: {
+    sortby: {
+      dataTypes: 'string'
+    , dataValues: Object.keys(SQL_SORT_MAP)
+    , description: 'sorting order for `sortstat` parameter'
+    , default: 'desc'
+    , transform: function(val) {
+        return SQL_SORT_MAP[val];
+      }
+    }
+  }
+})
+```
+
 
 Parameter Targeting
 -------------------
@@ -369,7 +467,7 @@ var params = instance.getRouteParams('/', '2.0.0')
 
 ### instance.getMergedParams(path, version, params, ...)
 
-Get a merged ***copy*** of the route parameterss found with parameters given. 
+Get a merged ***copy*** of the route parameters found with parameters given. 
 This is primarily a shortcut method for creating new routes while building upon 
 the previously defined parameters.
 
