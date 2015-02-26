@@ -211,6 +211,7 @@
         "dataTypes": [
           "number"
         ],
+        "min": 0,
         "max": 100
       }
     ],

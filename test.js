@@ -540,6 +540,21 @@ describe('Respectify Unit Tests', function() {
           })
       })
 
+      it('min 0', function(done) {
+        var obj = {
+          five: -1
+        }
+        var qs = queryString(obj)
+        request(server)
+          .get('/numbers' + qs)
+          .expect(409, function(err, res) {
+            ase(res.body.code, 'InvalidArgument')
+            var msg = 'Invalid param `five`, value must be between `0` and `100`, received `-1`'
+            ase(res.body.message, msg)
+            done(err)
+          })
+      })
+
       it('max', function(done) {
         var obj = {
           three: 201
@@ -564,7 +579,7 @@ describe('Respectify Unit Tests', function() {
           .get('/numbers' + qs)
           .expect(409, function(err, res) {
             ase(res.body.code, 'InvalidArgument')
-            var msg = 'Invalid param `five`, value must be lower than `100`, received `101`'
+            var msg = 'Invalid param `five`, value must be between `0` and `100`, received `101`'
             ase(res.body.message, msg)
             done(err)
           })
