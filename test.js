@@ -740,8 +740,8 @@ describe('Respectify Unit Tests', function() {
           .expect(200, function(err, res) {
             assert.deepEqual(res.body, {
               one: ['one', 'two', 'three']
-            , two: [true, false]
-            , three: [5,6,3]
+            , two: ['true', 'false']
+            , three: ['5','6','3']
             , four: ['one', 'two', 'three']
             })
             done(err)
@@ -1216,19 +1216,19 @@ describe('Respectify Unit Tests', function() {
         assert.ifError(inv(obj, 'off', paramSpec))
         ase(obj.off, false)
 
-        // Test lists
-        var paramSpec = {
-          dataTypes: ['boolean', 'array']
-        }
+        // // Test lists
+        // var paramSpec = {
+        //   dataTypes: ['boolean', 'array']
+        // }
 
-        // Truth tests
-        var obj = { on: ['1', 'TRUE', 1, true, undefined, ''] }
-        assert.ifError(inv(obj, 'on', paramSpec))
-        ade(obj.on, [true, true, true, true, true, true])
+        // // Truth tests
+        // var obj = { on: ['1', 'TRUE', 1, true, undefined, ''] }
+        // assert.ifError(inv(obj, 'on', paramSpec))
+        // ade(obj.on, [true, true, true, true, true, true])
 
-        var obj = { off: ['0', 'false', 0, false, '1'] }
-        assert.ifError(inv(obj, 'off', paramSpec))
-        ade(obj.off, [false, false, false, false, true])
+        // var obj = { off: ['0', 'false', 0, false, '1'] }
+        // assert.ifError(inv(obj, 'off', paramSpec))
+        // ade(obj.off, [false, false, false, false, true])
       })
 
       it('dataValues', function() {
@@ -1327,25 +1327,25 @@ describe('Respectify Unit Tests', function() {
         ase(obj.str, '')
 
         // List
-        var paramSpec = {
-          dataTypes: ['string', 'array']
-        }
+        // var paramSpec = {
+        //   dataTypes: ['string', 'array']
+        // }
         
-        var obj = { str: 'a,b,c' }
-        assert.ifError(inv(obj, 'str', paramSpec))
-        ade(obj.str, ['a','b','c'])
+        // var obj = { str: 'a,b,c' }
+        // assert.ifError(inv(obj, 'str', paramSpec))
+        // ade(obj.str, ['a','b','c'])
         
-        var obj = { str: '["a","b","c"]' }
-        assert.ifError(inv(obj, 'str', paramSpec))
-        ade(obj.str, ['a','b','c'])
+        // var obj = { str: '["a","b","c"]' }
+        // assert.ifError(inv(obj, 'str', paramSpec))
+        // ade(obj.str, ['a','b','c'])
         
-        var obj = { str: ['hey', 'there'] }
-        assert.ifError(inv(obj, 'str', paramSpec))
-        ade(obj.str, ['hey', 'there'])
+        // var obj = { str: ['hey', 'there'] }
+        // assert.ifError(inv(obj, 'str', paramSpec))
+        // ade(obj.str, ['hey', 'there'])
         
-        var obj = { str: 'a' }
-        assert.ifError(inv(obj, 'str', paramSpec))
-        ase(obj.str, 'a')
+        // var obj = { str: 'a' }
+        // assert.ifError(inv(obj, 'str', paramSpec))
+        // ase(obj.str, 'a')
       })
 
       it('dataValues', function() {
@@ -1425,22 +1425,22 @@ describe('Respectify Unit Tests', function() {
         assert.ifError(inv(obj, 'num', paramSpec))
         ase(obj.num, 9.99999999999999)
 
-        // List
-        var paramSpec = {
-          dataTypes: ['number', 'array']
-        }
+        // // List
+        // var paramSpec = {
+        //   dataTypes: ['number', 'array']
+        // }
         
-        var obj = { num: '1,2,3' }
-        assert.ifError(inv(obj, 'num', paramSpec))
-        ade(obj.num, [1, 2, 3])
+        // var obj = { num: '1,2,3' }
+        // assert.ifError(inv(obj, 'num', paramSpec))
+        // ade(obj.num, [1, 2, 3])
 
-        var obj = { num: ['1', '2'] }
-        assert.ifError(inv(obj, 'num', paramSpec))
-        ade(obj.num, [1, 2])
+        // var obj = { num: ['1', '2'] }
+        // assert.ifError(inv(obj, 'num', paramSpec))
+        // ade(obj.num, [1, 2])
 
-        var obj = { num: [30, 21] }
-        assert.ifError(inv(obj, 'num', paramSpec))
-        ade(obj.num, [30, 21])
+        // var obj = { num: [30, 21] }
+        // assert.ifError(inv(obj, 'num', paramSpec))
+        // ade(obj.num, [30, 21])
       })
 
       it('dataValues', function() {
@@ -1457,19 +1457,19 @@ describe('Respectify Unit Tests', function() {
         assert.ifError(inv(obj, 'num', paramSpec))
         ase(obj.num, 3.33)
 
-        // List
-        var paramSpec = {
-          dataTypes: ['number', 'array']
-        , dataValues: [1, 2, 3.33]
-        }
+        // // List
+        // var paramSpec = {
+        //   dataTypes: ['number', 'array']
+        // , dataValues: [1, 2, 3.33]
+        // }
 
-        var obj = { num: 3.33 }
-        assert.ifError(inv(obj, 'num', paramSpec))
-        ase(obj.num, 3.33)
+        // var obj = { num: 3.33 }
+        // assert.ifError(inv(obj, 'num', paramSpec))
+        // ase(obj.num, 3.33)
 
-        var obj = { num: '3.33, 2' }
-        assert.ifError(inv(obj, 'num', paramSpec))
-        ade(obj.num, [3.33, 2])
+        // var obj = { num: '3.33, 2' }
+        // assert.ifError(inv(obj, 'num', paramSpec))
+        // ade(obj.num, [3.33, 2])
       })
 
       it('errors', function() {
@@ -1534,15 +1534,15 @@ describe('Respectify Unit Tests', function() {
           ase(+obj.time, 1423094400000)
         })
 
-        var paramSpec = {
-          dataTypes: ['date', 'array']
-        }
-        var obj = { time: [t, Math.round(t / 1000), d] }
-        assert.ifError(inv(obj, 'time', paramSpec))
-        ade(
-          obj.time.map(function(x) { return +x })
-        , [1423170463349, 1423170463000, 1423170463349]
-        )
+        // var paramSpec = {
+        //   dataTypes: ['date', 'array']
+        // }
+        // var obj = { time: [t, Math.round(t / 1000), d] }
+        // assert.ifError(inv(obj, 'time', paramSpec))
+        // ade(
+        //   obj.time.map(function(x) { return +x })
+        // , [1423170463349, 1423170463000, 1423170463349]
+        // )
       })
 
       // Data values will not work with dates...
@@ -1601,60 +1601,60 @@ describe('Respectify Unit Tests', function() {
         assert.ifError(inv(obj, 'arr', paramSpec))
         ade(obj.arr, ['1', 2, 3])
 
-        // Mixed types
-        var paramSpec = {
-          dataTypes: ['array', 'boolean']
-        }
-        var obj = { arr: 'true,false' }
-        assert.ifError(inv(obj, 'arr', paramSpec))
-        ade(obj.arr, [true, false])
+        // // Mixed types
+        // var paramSpec = {
+        //   dataTypes: ['array', 'boolean']
+        // }
+        // var obj = { arr: 'true,false' }
+        // assert.ifError(inv(obj, 'arr', paramSpec))
+        // ade(obj.arr, [true, false])
 
 
-        var paramSpec = {
-          dataTypes: ['array', 'string']
-        }
-        var obj = { arr: '1' }
-        assert.ifError(inv(obj, 'arr', paramSpec))
-        ase(obj.arr, '1')
+        // var paramSpec = {
+        //   dataTypes: ['array', 'string']
+        // }
+        // var obj = { arr: '1' }
+        // assert.ifError(inv(obj, 'arr', paramSpec))
+        // ase(obj.arr, '1')
 
-        var obj = { arr: 'a,b,2' }
-        assert.ifError(inv(obj, 'arr', paramSpec))
-        ade(obj.arr, ['a', 'b', '2'])
+        // var obj = { arr: 'a,b,2' }
+        // assert.ifError(inv(obj, 'arr', paramSpec))
+        // ade(obj.arr, ['a', 'b', '2'])
 
-        var obj = { arr: '1,2,3' }
-        assert.ifError(inv(obj, 'arr', paramSpec))
-        ade(obj.arr, ['1', '2', '3'])
+        // var obj = { arr: '1,2,3' }
+        // assert.ifError(inv(obj, 'arr', paramSpec))
+        // ade(obj.arr, ['1', '2', '3'])
         
 
-        var paramSpec = {
-          dataTypes: ['array', 'number']
-        }
-        var obj = { arr: 1 }
-        assert.ifError(inv(obj, 'arr', paramSpec))
-        ase(obj.arr, 1)
+        // var paramSpec = {
+        //   dataTypes: ['array', 'number']
+        // }
+        // var obj = { arr: 1 }
+        // assert.ifError(inv(obj, 'arr', paramSpec))
+        // ase(obj.arr, 1)
 
-        var obj = { arr: '1,2,2' }
-        assert.ifError(inv(obj, 'arr', paramSpec))
-        ade(obj.arr, [1, 2, 2])
+        // var obj = { arr: '1,2,2' }
+        // assert.ifError(inv(obj, 'arr', paramSpec))
+        // ade(obj.arr, [1, 2, 2])
 
-        var obj = { arr: [2, 3] }
-        assert.ifError(inv(obj, 'arr', paramSpec))
-        ade(obj.arr, [2, 3])
+        // var obj = { arr: [2, 3] }
+        // assert.ifError(inv(obj, 'arr', paramSpec))
+        // ade(obj.arr, [2, 3])
 
-        var paramSpec = {
-          dataTypes: ['array', 'number', 'string']
-        }
-        var obj = { arr: '1' }
-        assert.ifError(inv(obj, 'arr', paramSpec))
-        ade(obj.arr, 1)
+        // var paramSpec = {
+        //   dataTypes: ['array', 'number', 'string']
+        // }
+        // var obj = { arr: '1' }
+        // assert.ifError(inv(obj, 'arr', paramSpec))
+        // ade(obj.arr, 1)
 
-        var obj = { arr: 'a,b,2' }
-        assert.ifError(inv(obj, 'arr', paramSpec))
-        ade(obj.arr, ['a', 'b', 2])
+        // var obj = { arr: 'a,b,2' }
+        // assert.ifError(inv(obj, 'arr', paramSpec))
+        // ade(obj.arr, ['a', 'b', 2])
 
-        var obj = { arr: ['hey', 'there'] }
-        assert.ifError(inv(obj, 'arr', paramSpec))
-        ade(obj.arr, ['hey', 'there'])
+        // var obj = { arr: ['hey', 'there'] }
+        // assert.ifError(inv(obj, 'arr', paramSpec))
+        // ade(obj.arr, ['hey', 'there'])
       })
 
       // Direct data values don't apply, mixed type data values 
@@ -1676,7 +1676,7 @@ describe('Respectify Unit Tests', function() {
           dataTypes: ['array', 'number']
         }
         errTest({ arr: 'a' }, 'arr', paramSpec)
-        errTest({ arr: 'a,b,c' }, 'arr', paramSpec)
+        // errTest({ arr: 'a,b,c' }, 'arr', paramSpec)
       })
     })
 
