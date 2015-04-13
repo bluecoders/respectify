@@ -129,8 +129,10 @@ server.get({
 
 ### param.validate(value, req, param)
 
-Parameter specific validation method, returns `false` if valid, or any 
+Parameter specific validation method, should return `false` if valid, or any 
 `Error` instance for failures. Synchronous.
+
+*Note:* This will only be called if the parameter has a value
 
 * `value` - incoming request value, after initial validation
 * `req` - restify request object
@@ -173,6 +175,8 @@ server.get({path: '/users'
 
 Parameter specific transform method. This value returned from this method will 
 always be used, even if `undefined` returned. Synchronous.
+
+*Note:* This will only be called if the parameter has a value
 
 * `value` - incoming request value, after initial validation
 * `req` - restify request object
