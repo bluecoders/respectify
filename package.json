@@ -1,34 +1,35 @@
 {
-  "name": "respectify"
-, "author": "Beau Sorensen <mail@beausorensen.com> (http://github.com/sorensen)"
-, "version": "2.0.0"
-, "license": "MIT"
-, "keywords": [
-    "restify"
-  , "specification"
-  , "sanitization"
-  ]
-, "description": "Restify specification tool"
-, "repository": {
-    "type": "git"
-  , "url": "git://github.com/majorleaguesoccer/respectify.git"
-  }
-, "engines": {
+  "name": "respectify",
+  "author": "Beau Sorensen <mail@beausorensen.com> (http://github.com/sorensen)",
+  "version": "2.0.0",
+  "license": "MIT",
+  "keywords": [
+    "restify",
+    "specification",
+    "sanitization"
+  ],
+  "description": "Restify specification tool",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/majorleaguesoccer/respectify.git"
+  },
+  "engines": {
     "node": "0.x"
-  }
-, "main": "index.js"
-, "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -R spec test.js"
-  , "hint": "jshint *.js lib/*.js example/*.js --extra-ext .json"
-  }
-, "dependencies": {
-    "semver": "2.2.1"
-  , "underscore": "1.7.0"
-  , "debug": "^2.1.1"
-  }
-, "devDependencies": {
-    "mocha": "1.8.1"
-  , "supertest" : "0.5.1"
-  , "restify": "2.8.5"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run hint; ./node_modules/mocha/bin/mocha -R spec test.js",
+    "hint": "./node_modules/jshint/bin/jshint ./"
+  },
+  "dependencies": {
+    "debug": "^2.1.1",
+    "semver": "^4.3.3",
+    "underscore": "1.7.0"
+  },
+  "devDependencies": {
+    "jshint": "^2.7.0",
+    "mocha": "1.8.1",
+    "restify": "2.8.5",
+    "supertest": "0.5.1"
   }
 }
