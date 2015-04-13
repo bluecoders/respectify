@@ -162,6 +162,52 @@ describe('Respectify Unit Tests', function() {
     })
 
     it('getRouteParams()', function() {
+      var server = restify.createServer()
+      var inst = new Respectify(server)
+      
+      server.use(restify.queryParser())
+      server.use(inst.middleware())
+
+      server.get({path: '/routeparams', version: '1.0.0', flags: 'i', params: {
+        main: {
+          dataTypes: ['array', 'number']
+        , default: function(req, spec) {
+            return [2]
+          }
+        , validate: function(val, req, spec) {
+            return !!~val.indexOf(2)
+          }
+        , transform: function(val, req, spec) {
+            return val.map(function(v) {
+              return v * 2
+            })
+          }
+        }
+      }}, function() {})
+
+      var params = inst.getRouteParams('/routeparams', '1.0.0')
+
+      ase(params.main.name, 'main')
+      ase(params.main.required, false)
+      ase(params.main.paramType, 'querystring')
+      ade(params.main.dataTypes, ['array', 'number'])
+
+      // Ensure our functions are getting copied over
+      ase(typeof params.main.default, 'function')
+      ase(typeof params.main.transform, 'function')
+      ase(typeof params.main.validate, 'function')
+
+      // Ensure we arent changing anything by reference.
+      params.main.default = 2
+      params.main.paramType = 'foobar'
+
+      var params2 = inst.getRouteParams('/routeparams', '1.0.0')
+
+      ase(typeof params2.main.default, 'function')
+      ase(params2.main.paramType, 'querystring')
+    })
+
+    it('getRouteParams()', function() {
       var inst = new Respectify(server, {
         params: {
           bar: {
