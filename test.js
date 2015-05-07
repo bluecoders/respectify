@@ -427,6 +427,12 @@ describe('Respectify Unit Tests', function() {
             ase(err, null)
             ase(res.body.code, 'InvalidArgument')
             ase(res.body.message, 'Not divisible by 10')
+            ade(res.body.parameter, { 
+              name: 'things'
+            , required: true
+            , paramType: 'path'
+            , dataTypes: ['number']
+            }) 
             done(err)
           })
       })
@@ -469,7 +475,13 @@ describe('Respectify Unit Tests', function() {
           .expect(409, function(err, res) {
             ase(err, null)
             ase(res.body.code, 'InvalidArgument')
-            assert(!~~res.body.message, 'Invalid param `one`')
+            assert(~res.body.message, 'Invalid param `one`')
+            ade(res.body.parameter, { 
+              name: 'one',
+              required: false,
+              paramType: 'querystring',
+              dataTypes: [ 'boolean' ] 
+            })
             done(err)
           })
       })
@@ -585,6 +597,12 @@ describe('Respectify Unit Tests', function() {
           .get('/numbers' + qs)
           .expect(409, function(err, res) {
             ase(res.body.code, 'InvalidArgument')
+            ade(res.body.parameter, { 
+              name: 'two',
+              required: false,
+              paramType: 'querystring',
+              dataTypes: [ 'number' ] 
+            })
             done(err)
           })
       })
@@ -599,7 +617,15 @@ describe('Respectify Unit Tests', function() {
           .expect(409, function(err, res) {
             ase(res.body.code, 'InvalidArgument')
             var msg = 'Invalid param `four`, value must be higher than `-10`, received `-11`'
+            
             ase(res.body.message, msg)
+            ade(res.body.parameter, { 
+              name: 'four',
+              required: false,
+              paramType: 'querystring',
+              dataTypes: [ 'number' ],
+              min: -10 
+            })
             done(err)
           })
       })
@@ -614,7 +640,16 @@ describe('Respectify Unit Tests', function() {
           .expect(409, function(err, res) {
             ase(res.body.code, 'InvalidArgument')
             var msg = 'Invalid param `five`, value must be between `0` and `100`, received `-1`'
+            
             ase(res.body.message, msg)
+            ade(res.body.parameter, { 
+              name: 'five',
+              required: false,
+              paramType: 'querystring',
+              dataTypes: [ 'number' ],
+              min: 0,
+              max: 100 
+            })
             done(err)
           })
       })
@@ -630,6 +665,14 @@ describe('Respectify Unit Tests', function() {
             ase(res.body.code, 'InvalidArgument')
             var msg = 'Invalid param `three`, value must be lower than `200`, received `201`'
             ase(res.body.message, msg)
+            ade(res.body.parameter, { 
+              name: 'three',
+              required: false,
+              paramType: 'querystring',
+              dataTypes: [ 'number' ],
+              max: 200,
+              default: 0 
+            })
             done(err)
           })
       })
@@ -645,6 +688,14 @@ describe('Respectify Unit Tests', function() {
             ase(res.body.code, 'InvalidArgument')
             var msg = 'Invalid param `five`, value must be between `0` and `100`, received `101`'
             ase(res.body.message, msg)
+            ade(res.body.parameter, { 
+              name: 'five',
+              required: false,
+              paramType: 'querystring',
+              dataTypes: [ 'number' ],
+              min: 0,
+              max: 100 
+            })
             done(err)
           })
       })
@@ -696,6 +747,12 @@ describe('Respectify Unit Tests', function() {
           .get('/dates' + qs)
           .expect(409, function(err, res) {
             ase(res.body.code, 'InvalidArgument')
+            ade(res.body.parameter, { 
+              name: 'one',
+              required: false,
+              paramType: 'querystring',
+              dataTypes: [ 'date' ] 
+            })
             done(err)
           })
       })
@@ -781,6 +838,12 @@ describe('Respectify Unit Tests', function() {
           .get('/objects' + qs)
           .expect(409, function(err, res) {
             ase(res.body.code, 'InvalidArgument')
+            ade(res.body.parameter, { 
+              name: 'one',
+              required: false,
+              paramType: 'querystring',
+              dataTypes: [ 'object' ] 
+            })
             done(err)
           })
       })
@@ -849,6 +912,7 @@ describe('Respectify Unit Tests', function() {
           .get('/arrays' + qs)
           .expect(409, function(err, res) {
             ase(res.body.code, 'InvalidArgument')
+            ase(typeof res.body.parameter, 'object')
             done(err)
           })
       })
@@ -1228,6 +1292,8 @@ describe('Respectify Unit Tests', function() {
           || err instanceof restify.MissingParameterError
         , 'Invalid error type: ' + err)
         ase(err.statusCode, 409)
+
+        ase(typeof err.body.parameter, 'object')
 
         if (err instanceof restify.InvalidArgumentError) {
           assert(!!~err.message.indexOf('Invalid param `' + prop))
