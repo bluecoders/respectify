@@ -1284,8 +1284,10 @@ describe('Respectify Unit Tests', function() {
     function errTest(obj, prop, paramSpec) {
       var errs = inv(obj, prop, paramSpec)
 
+      assert(errs, 'No error found')
+
       if (!Array.isArray(errs)) errs = [errs]
-      
+
       errs.forEach(function(err) {
         assert(
           err instanceof restify.InvalidArgumentError
@@ -1828,6 +1830,25 @@ describe('Respectify Unit Tests', function() {
         var obj = { arr: ['hey', 'there'] }
         assert.ifError(inv(obj, 'arr', paramSpec))
         ade(obj.arr, ['hey', 'there'])
+
+        var paramSpec = {
+          dataTypes: ['array', 'object']
+        , required: true
+        , params: [{
+            dataTypes: ['number']
+          , name: 'price'
+          , required: true
+          }]
+        }
+        var obj = { 
+          arr: [{
+            price: 20
+          }, {
+            price: 50
+          }]
+        }
+        var err = inv(obj, 'arr', paramSpec)
+        assert.ifError(inv(obj, 'arr', paramSpec))
       })
 
       // Direct data values don't apply, mixed type data values 
@@ -1850,6 +1871,24 @@ describe('Respectify Unit Tests', function() {
         }
         errTest({ arr: 'a' }, 'arr', paramSpec)
         errTest({ arr: 'a,b,c' }, 'arr', paramSpec)
+
+        var paramSpec = {
+          dataTypes: ['array', 'object']
+        , required: true
+        , params: [{
+            dataTypes: ['number']
+          , name: 'price'
+          , required: true
+          }]
+        }
+        var obj = { 
+          arr: [{
+            price: 20
+          }, {
+            price: 'abc'
+          }]
+        }
+        errTest(obj, 'arr', paramSpec)
       })
     })
 
