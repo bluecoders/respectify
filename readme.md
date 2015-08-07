@@ -49,6 +49,12 @@ var restify = require('restify')
 // Create the restify server
 var server = restify.createServer()
  
+// Create the respectify instance with the new server
+var respect = new Respectify(server)
+ 
+// Add the respectify middleware to validate routes
+server.use(respect.middleware())
+
 server.get({
   path: '/things/:id'
 , version: '1.0.0'
@@ -61,13 +67,7 @@ server.get({
   }
 }, function(req, res, next) {
   // ...
-})
- 
-// Create the respectify instance with the new server
-var respect = new Respectify(server, options)
- 
-// Add the respectify middleware to validate routes
-server.use(respect.middleware)
+}) 
 ```
 
 
