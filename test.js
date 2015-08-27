@@ -1702,6 +1702,7 @@ describe('Respectify Unit Tests', function() {
         , '02-05-2015 00:00'
         , '02-05-2015 00:00:00'
         , '02-05-2015 00:00:00 -0800'
+        , '2015-02-05T00:00:00.000Z'
         ].forEach(function(x) {
           var obj = { time: x }
           assert.ifError(inv(obj, 'time', paramSpec))
