@@ -1813,6 +1813,19 @@ describe('Respectify Unit Tests', function() {
         
 
         var paramSpec = {
+          dataTypes: ['array', 'string']
+        , dataValues: ['live', 'played', 'upcoming']
+        , transform: function(val) {
+            if (!Array.isArray(val)) val = [val]
+            return val
+          }
+        }
+        var obj = { arr: 'live,played' }
+        assert.ifError(inv(obj, 'arr', paramSpec))
+        ade(obj.arr, ['live', 'played'])
+
+
+        var paramSpec = {
           dataTypes: ['array', 'number']
         }
         var obj = { arr: 1 }
