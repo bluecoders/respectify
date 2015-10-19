@@ -589,6 +589,11 @@ This project uses the [debug](https://github.com/visionmedia/debug) module for
 logging, and can be activated using `DEBUG=respectify` or `DEBUG=respectify:verbose`
 
 
+Contributors
+------------
+
+[Jarrett Gossett](https://github.com/jetpackjarrett)
+
 
 License
 -------

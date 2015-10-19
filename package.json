@@ -8,6 +8,12 @@
     "specification",
     "sanitization"
   ],
+  "contributors": [
+    {
+      "name": "Jarrett Gossett"
+    , "github": "https://github.com/jetpackjarrett"
+    }
+  ],
   "description": "Restify specification tool",
   "repository": {
     "type": "git",

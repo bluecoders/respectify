@@ -1284,10 +1284,8 @@ describe('Respectify Unit Tests', function() {
     function errTest(obj, prop, paramSpec) {
       var errs = inv(obj, prop, paramSpec)
 
-      assert(errs, 'No error found')
-
       if (!Array.isArray(errs)) errs = [errs]
-
+      
       errs.forEach(function(err) {
         assert(
           err instanceof restify.InvalidArgumentError
@@ -1304,6 +1302,19 @@ describe('Respectify Unit Tests', function() {
         }
       })
     }
+
+    // Ensure that sending `%` as value doesn't cause sprintf errors
+    // SEE: https://github.com/restify/node-restify/issues/646
+    it('sprintf', function() {
+      var paramSpec = {
+        dataTypes: ['string']
+      , dataValues: ['a', 'b']
+      }
+
+      var obj = { on: '%s 1' }
+      var err = inv(obj, 'on', paramSpec)
+      ase(err instanceof restify.InvalidArgumentError, true)
+    })
 
     /*!
      * Boolean validation
@@ -1702,7 +1713,6 @@ describe('Respectify Unit Tests', function() {
         , '02-05-2015 00:00'
         , '02-05-2015 00:00:00'
         , '02-05-2015 00:00:00 -0800'
-        , '2015-02-05T00:00:00.000Z'
         ].forEach(function(x) {
           var obj = { time: x }
           assert.ifError(inv(obj, 'time', paramSpec))
@@ -1831,25 +1841,6 @@ describe('Respectify Unit Tests', function() {
         var obj = { arr: ['hey', 'there'] }
         assert.ifError(inv(obj, 'arr', paramSpec))
         ade(obj.arr, ['hey', 'there'])
-
-        var paramSpec = {
-          dataTypes: ['array', 'object']
-        , required: true
-        , params: [{
-            dataTypes: ['number']
-          , name: 'price'
-          , required: true
-          }]
-        }
-        var obj = { 
-          arr: [{
-            price: 20
-          }, {
-            price: 50
-          }]
-        }
-        var err = inv(obj, 'arr', paramSpec)
-        assert.ifError(inv(obj, 'arr', paramSpec))
       })
 
       // Direct data values don't apply, mixed type data values 
@@ -1872,24 +1863,6 @@ describe('Respectify Unit Tests', function() {
         }
         errTest({ arr: 'a' }, 'arr', paramSpec)
         errTest({ arr: 'a,b,c' }, 'arr', paramSpec)
-
-        var paramSpec = {
-          dataTypes: ['array', 'object']
-        , required: true
-        , params: [{
-            dataTypes: ['number']
-          , name: 'price'
-          , required: true
-          }]
-        }
-        var obj = { 
-          arr: [{
-            price: 20
-          }, {
-            price: 'abc'
-          }]
-        }
-        errTest(obj, 'arr', paramSpec)
       })
     })
 
