@@ -1,7 +1,7 @@
 {
   "name": "respectify",
   "author": "Beau Sorensen <mail@beausorensen.com> (http://github.com/sorensen)",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "license": "MIT",
   "keywords": [
     "restify",
@@ -10,8 +10,8 @@
   ],
   "contributors": [
     {
-      "name": "Jarrett Gossett"
-    , "github": "https://github.com/jetpackjarrett"
+      "name": "Jarrett Gossett",
+      "github": "https://github.com/jetpackjarrett"
     }
   ],
   "description": "Restify specification tool",
