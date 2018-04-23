@@ -1,4 +1,0 @@
-node_modules/*
-*.md
-*.ignore.js
-test/data/*

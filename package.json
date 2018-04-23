@@ -29,8 +29,10 @@
   },
   "dependencies": {
     "debug": "^2.1.1",
-    "semver": "^4.3.3",
+    "eslint": "^4.19.1",
+    "eslint-config-bluecoders": "^1.0.5",
     "lodash": "^3.5.0",
+    "semver": "^4.3.3",
     "var-type": "^1.0.0"
   },
   "devDependencies": {

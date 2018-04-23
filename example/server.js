@@ -4,20 +4,20 @@
  * Module dependencies.
  */
 
-var assert = require('assert')
+const assert = require('assert')
   , restify = require('restify')
   , Respectify = require('../index')
   , server = restify.createServer()
 
 // Create the respectify instance with default parameters
-var respect = new Respectify(server)
+const respect = new Respectify(server)
 
 server.use(restify.queryParser())
 server.use(respect.middleware())
 
 function ok(req, res, next) {
   // Undefined params should always be filtered out
-  for (var prop in req.params) {
+  for (const prop in req.params) {
     assert.notEqual(typeof req.params[prop], 'undefined')
   }
   res.send(req.params)

@@ -3,7 +3,7 @@ Respectify
 
 > Route specification for [restify](http://mcavage.me/node-restify/)
 
-[![Build Status](https://secure.travis-ci.org/majorleaguesoccer/respectify.png)](http://travis-ci.org/majorleaguesoccer/respectify) 
+[![Build Status](https://secure.travis-ci.org/majorleaguesoccer/respectify.png)](http://travis-ci.org/majorleaguesoccer/respectify)
 [![devDependency Status](https://david-dm.org/majorleaguesoccer/respectify.png)](https://david-dm.org/majorleaguesoccer/respectify#info=dependencies)
 [![NPM version](https://badge.fury.io/js/respectify.png)](http://badge.fury.io/js/respectify)
 
@@ -43,15 +43,15 @@ Usage
 -----
 
 ```js
-var restify = require('restify')
+const restify = require('restify')
   , Respectify = require('respectify')
- 
+
 // Create the restify server
-var server = restify.createServer()
- 
+const server = restify.createServer()
+
 // Create the respectify instance with the new server
-var respect = new Respectify(server)
- 
+const respect = new Respectify(server)
+
 // Add the respectify middleware to validate routes
 server.use(respect.middleware())
 
@@ -67,14 +67,14 @@ server.get({
   }
 }, function(req, res, next) {
   // ...
-}) 
+})
 ```
 
 
 Parameters
 ----------
 
-A `params` object must be added to the route options in order for Respectify 
+A `params` object must be added to the route options in order for Respectify
 to parse and / or validate the route.
 
 * `dataTypes` - one of the following: `number`, `date`, `string`, `array`, `object`, `boolean`
@@ -129,7 +129,7 @@ server.get({
 
 ### param.validate(value, req, param)
 
-Parameter specific validation method, should return `false` if valid, or any 
+Parameter specific validation method, should return `false` if valid, or any
 `Error` instance for failures. Synchronous.
 
 *Note:* This will only be called if the parameter has a value
@@ -152,9 +152,9 @@ server.get({path: '/users'
     , min: 1
     , max: 1000
     , validate: function(val, req) {
-        var ttl = req.params.ttl;
+        const ttl = req.params.ttl;
         if (val && +val > 200 && (!ttl || +ttl < 1800)) {
-          var msg = ''
+          const msg = ''
             + 'Invalid param `pagesize`, value must be under `200`'
             + ' if no `ttl` was provided, or if `ttl` is less than `1800`'
             ;
@@ -173,7 +173,7 @@ server.get({path: '/users'
 
 ### param.transform(value, req, param)
 
-Parameter specific transform method. This value returned from this method will 
+Parameter specific transform method. This value returned from this method will
 always be used, even if `undefined` returned. Synchronous.
 
 *Note:* This will only be called if the parameter has a value
@@ -213,10 +213,10 @@ server.get({path: '/users'
 
 ### Arrays
 
-If `array` is used as a dataType, the elements of array will be re-validated against 
+If `array` is used as a dataType, the elements of array will be re-validated against
 the remaining dataTypes.
 
-For example, a parameter defined with both `array` and `number` is interpreted to 
+For example, a parameter defined with both `array` and `number` is interpreted to
 be either a single number value, or an array of numbers.
 
 ```js
@@ -240,9 +240,9 @@ req.params.id === [10, 40]
 
 ### Objects
 
-If using `object` as a dataType, a nested `params` definition may be added to 
-specify property values. When using `required` on a nested parameter definition, 
-only the current object level is looked at. 
+If using `object` as a dataType, a nested `params` definition may be added to
+specify property values. When using `required` on a nested parameter definition,
+only the current object level is looked at.
 
 ```js
 {
@@ -265,8 +265,8 @@ only the current object level is looked at.
         , last: {
             dataTypes: 'string'
 
-            // This parameter is only required if `name` is sent, because 
-            // the parent parameter is not required. 
+            // This parameter is only required if `name` is sent, because
+            // the parent parameter is not required.
           , required: true
           }
         }
@@ -280,24 +280,24 @@ only the current object level is looked at.
 Parameter Targeting
 -------------------
 
-By default, respectify will only use what has been populated in the `req.params` 
-object from restify, which should cover most use cases.  If you are using the restify 
-`queryParser` and / or `bodyParser`, restify will map these to the `req.params` 
+By default, respectify will only use what has been populated in the `req.params`
+object from restify, which should cover most use cases.  If you are using the restify
+`queryParser` and / or `bodyParser`, restify will map these to the `req.params`
 object (unless you specified `mapParams: false`)
 
-You can specify param targeting by passing a `paramTarget` option to the respectify 
-constructor, or by adding it as a route property, valid options are `query`, `params`, 
+You can specify param targeting by passing a `paramTarget` option to the respectify
+constructor, or by adding it as a route property, valid options are `query`, `params`,
 and `body`.
 
-***Note:*** The original target object of the request, `params`, `body`, and `query` 
-may have its properties overwitten or deleted by the `respectify.middleware`. If you 
+***Note:*** The original target object of the request, `params`, `body`, and `query`
+may have its properties overwitten or deleted by the `respectify.middleware`. If you
 need the original values, you will need to use a middleware function to preserve them.
 
 ```js
 // Shallow clone the `param` object to preserve original values
 server.use(function(req, res, next) {
   req.__params = {}
-  for (var prop in req.params) {
+  for (const prop in req.params) {
     req.__params[prop] = req.params[prop]
   }
 })
@@ -308,7 +308,7 @@ server.use(respectify.middleware)
 API
 ---
 
-***Note:*** These methods are currently somewhat disorganized, as this module evolves, these 
+***Note:*** These methods are currently somewhat disorganized, as this module evolves, these
 methods and their responses will be normalized and hopefully easier to use.
 
 
@@ -327,15 +327,15 @@ Respectify constructor
 Example:
 
 ```js
-var server = restify.createServer()
-var respect = new Respectify(server)
+const server = restify.createServer()
+const respect = new Respectify(server)
 ```
 
 
 ### instance.middleware([options])
 
-Route middleware to add parameter validation, this will filter all properties 
-of `req.params` according to the param definition of the route.  Parameters received 
+Route middleware to add parameter validation, this will filter all properties
+of `req.params` according to the param definition of the route.  Parameters received
 that have not been defined will be removed.
 
 ***Note:*** The middleware should come after `restify.queryParser` and / or `restify.bodyParser`
@@ -375,8 +375,8 @@ server.get({
 
 ### instance.getSpecByRoute(route)
 
-Get the specification of a given restify route object. The route itself can be 
-retrieved using restify's `router.find()` method or the `instance.findRoutes()` 
+Get the specification of a given restify route object. The route itself can be
+retrieved using restify's `router.find()` method or the `instance.findRoutes()`
 method above.
 
 See [route-information](./example/route-information.js) for example usage.
@@ -385,7 +385,7 @@ See [route-information](./example/route-information.js) for example usage.
 
 ```js
 server.router.find(req, res, function(err, route, params) {
-  var spec = instance.getSpecByRoute(route)  
+  const spec = instance.getSpecByRoute(route)
 })
 ```
 
@@ -398,7 +398,7 @@ Find parameter defaults for a given route
 * `version` - load only supplied version (optional, default latest version)
 
 ```js
-var defaults = instance.getDefaults('/', '1.0.0')
+const defaults = instance.getDefaults('/', '1.0.0')
 ```
 
 ```json
@@ -413,7 +413,7 @@ var defaults = instance.getDefaults('/', '1.0.0')
 * `version` - load only supplied version (optional, default latest version)
 
 ```js
-var specs = instance.loadSpecs('1.0.0')
+const specs = instance.loadSpecs('1.0.0')
 ```
 
 ```json
@@ -447,7 +447,7 @@ Find restify route objects, mainly used internally.
 * `version` - load only supplied version (optional, default latest version)
 
 ```js
-var routes = instance.findRoutes('/', '2.0.0')
+const routes = instance.findRoutes('/', '2.0.0')
 ```
 
 ```json
@@ -486,7 +486,7 @@ Find restify route objects, mainly used internally.
 * `version` - load only supplied version (optional, default latest version)
 
 ```js
-var specs = instance.findSpecs('/', '2.0.0')
+const specs = instance.findSpecs('/', '2.0.0')
 ```
 
 ```json
@@ -524,7 +524,7 @@ Get a ***copy*** of the parameters for a given route as a key value mapping.
 * `version` - load only supplied version (optional, default latest version)
 
 ```js
-var params = instance.getRouteParams('/', '2.0.0')
+const params = instance.getRouteParams('/', '2.0.0')
 ```
 
 ```json
@@ -544,8 +544,8 @@ var params = instance.getRouteParams('/', '2.0.0')
 
 ### instance.getMergedParams(path, version, params, ...)
 
-Get a merged ***copy*** of the route parameters found with parameters given. 
-This is primarily a shortcut method for creating new routes while building upon 
+Get a merged ***copy*** of the route parameters found with parameters given.
+This is primarily a shortcut method for creating new routes while building upon
 the previously defined parameters.
 
 * `path` - route pathname as defined for restify
@@ -553,7 +553,7 @@ the previously defined parameters.
 * `params` - any number of parameter objects to merge
 
 ```js
-var params = instance.getMergedParams('/', '2.0.0', {
+const params = instance.getMergedParams('/', '2.0.0', {
   pagesize: {
     dataTypes: 'number'
   , description: 'Page size'
@@ -585,7 +585,7 @@ var params = instance.getMergedParams('/', '2.0.0', {
 Debugging
 ---------
 
-This project uses the [debug](https://github.com/visionmedia/debug) module for 
+This project uses the [debug](https://github.com/visionmedia/debug) module for
 logging, and can be activated using `DEBUG=respectify` or `DEBUG=respectify:verbose`
 
 

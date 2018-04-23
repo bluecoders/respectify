@@ -4,7 +4,7 @@
 //
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
 
-var assert = require('assert')
+const assert = require('assert')
   , restify = require('restify')
   , Respectify = require('../index')
   , server = restify.createServer()
@@ -15,10 +15,10 @@ var assert = require('assert')
 server.use(restify.queryParser())
 server.use(respect.middleware)
 
-// Intercept all OPTIONS method requests, find all specifications for the 
+// Intercept all OPTIONS method requests, find all specifications for the
 // requested route / url for each other HTTP method
 server.opts(/.+/, function(req, res, next) {
-  var _method = req.method
+  const _method = req.method
     , methods = ['GET', 'POST', 'PUT', 'HEAD', 'DELETE']
 
   // Intended to represent the entire server
@@ -28,7 +28,7 @@ server.opts(/.+/, function(req, res, next) {
 
   // Iterate through all HTTP methods to find possible routes
   async.mapSeries(methods, function(method, cb) {
-    
+
     // Change the request method so restify can find the correct route
     req.method = method
 

@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore')
+const _ = require('underscore')
   , fs = require('fs')
   , fpath = __dirname + '/spec.tmpl.md'
   , template = fs.readFileSync(fpath, 'utf-8')
@@ -8,7 +8,7 @@ var _ = require('underscore')
   , server = example.server
   , respect = example.respect
 
-var docs = _.template(template, {
+const docs = _.template(template, {
   specs: respect.loadSpecs()
 })
 
