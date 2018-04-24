@@ -32,13 +32,8 @@
     "eslint": "^4.19.1",
     "eslint-config-bluecoders": "^1.0.5",
     "lodash": "^3.5.0",
+    "restify-errors": "^6.0.0",
     "semver": "^4.3.3",
     "var-type": "^1.0.0"
-  },
-  "devDependencies": {
-    "jshint": "^2.7.0",
-    "mocha": "1.8.1",
-    "restify": "^3.0.2",
-    "supertest": "0.5.1"
   }
 }
