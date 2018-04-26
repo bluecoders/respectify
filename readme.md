@@ -43,8 +43,8 @@ Usage
 -----
 
 ```js
-const restify = require('restify')
-  , Respectify = require('respectify')
+const restify = require('restify'), 
+  Respectify = require('respectify')
 
 // Create the restify server
 const server = restify.createServer()
@@ -56,13 +56,13 @@ const respect = new Respectify(server)
 server.use(respect.middleware())
 
 server.get({
-  path: '/things/:id'
-, version: '1.0.0'
-, params: {
-    id: 'number'
-  , another: {
-      dataTypes: ['number', 'string']
-    , default: 20
+  path: '/things/:id', 
+  version: '1.0.0',
+  params: {
+    id: 'number', 
+    another: {
+      dataTypes: ['number', 'string'],
+      default: 20
     }
   }
 }, function(req, res, next) {
@@ -89,31 +89,32 @@ to parse and / or validate the route.
 
 ```js
 server.get({
-  path: '/users/:id'
-, version: '1.0.0'
-, params: {
-    one: 'boolean'
-  , two: ['date', 'number']
-  , three: {
-      dataTypes: ['string', 'number']
-    , default: 20
-    , dataValues: [10, 'a', 30]
-    , transform: function(val, req, param) {
-        if (val === 'a') return 20
-        return val
+  path: '/users/:id', 
+  version: '1.0.0',
+  params: {
+    one: 'boolean',
+    two: ['date', 'number'],
+    three: {
+      dataTypes: ['string', 'number'],
+      default: 20,
+      dataValues: [10, 'a', 30],
+      transform: function(val, req, param) {
+        if (val === 'a') {
+        return 20;
       }
-    }
-  , pagesize: {
-      dataTypes: 'number'
-    , desc: 'page size'
-    , default: 50
-    , min: 0
-    , max: 250
-    }
-  , random: {
-      dataTypes: 'number'
-    , default: function() { return Math.round(Math.random()) }
-    , validate: function(val, req, param) {
+      return val;
+    }, 
+    pagesize: {
+      dataTypes: 'number',
+      desc: 'page size',
+      default: 50,
+      min: 0,
+      max: 250
+    },
+    random: {
+      dataTypes: 'number',
+      default: function() { return Math.round(Math.random()) },
+      validate: function(val, req, param) {
         if (val === 10) {
           return new Error('i hate that number')
         }
@@ -141,28 +142,27 @@ Parameter specific validation method, should return `false` if valid, or any
 Example:
 
 ```js
-server.get({path: '/users'
-, versions: ['2.0.0']
-, flags: 'i'
-, params: {
+server.get({path: '/users',
+versions: ['2.0.0'],
+flags: 'i',
+params: {
     pagesize: {
-      dataTypes: 'number'
-    , description: 'page size'
-    , default: 50
-    , min: 1
-    , max: 1000
-    , validate: function(val, req) {
+      dataTypes: 'number',
+      description: 'page size',
+      default: 50,
+      min: 1,
+      max: 1000,
+      validate: function(val, req) {
         const ttl = req.params.ttl;
         if (val && +val > 200 && (!ttl || +ttl < 1800)) {
-          const msg = ''
-            + 'Invalid param `pagesize`, value must be under `200`'
-            + ' if no `ttl` was provided, or if `ttl` is less than `1800`'
-            ;
+          const msg = 'Invalid param `pagesize`, value must be under `200`' + 
+            ' if no `ttl` was provided, or if `ttl` is less than `1800`';
+            
           return new restify.InvalidArgumentError(msg);
         }
         return false;
-      }
-    , notes: [
+      },
+      notes: [
         'if a value of over `200` is used, a `ttl` value of `1800` or more must also be used'
       ]
     }
@@ -186,22 +186,23 @@ Example:
 
 ```js
 SQL_SORT_MAP = {
-  asc:        'ASC'
-, acending:   'ASC'
-, desc:       'DESC'
-, descending: 'DESC'
+  asc:        'ASC',
+  acending:   'ASC',
+  desc:       'DESC',
+  descending: 'DESC'
 };
 
-server.get({path: '/users'
-, versions: ['2.0.0']
-, flags: 'i'
-, params: {
+server.get({
+  path: '/users',
+  versions: ['2.0.0'],
+  flags: 'i',
+  params: {
     sortby: {
-      dataTypes: 'string'
-    , dataValues: Object.keys(SQL_SORT_MAP)
-    , description: 'sorting order for `sortstat` parameter'
-    , default: 'desc'
-    , transform: function(val) {
+      dataTypes: 'string',
+      dataValues: Object.keys(SQL_SORT_MAP),
+      description: 'sorting order for `sortstat` parameter',
+      default: 'desc',
+      transform: function(val) {
         return SQL_SORT_MAP[val];
       }
     }
@@ -247,27 +248,25 @@ only the current object level is looked at.
 ```js
 {
   user: {
-    dataTypes: ['object']
-  , params: {
-      id: 'number'
-    , email: {
-        dataTypes: ['string']
-
+    dataTypes: ['object'],
+    params: {
+      id: 'number',
+      email: {
+        dataTypes: ['string'],
         // This will only be required if the `user` param is sent.
-      , required: true
-      }
-    , name: {
-        dataTypes: ['object']
-      , params: {
+        required: true
+      },
+      name: {
+        dataTypes: ['object'],
+        params: {
           first: {
-            dataTypes: 'string'
-          }
-        , last: {
-            dataTypes: 'string'
-
+            dataTypes: 'string',
+          },
+          last: {
+            dataTypes: 'string',
             // This parameter is only required if `name` is sent, because
             // the parent parameter is not required.
-          , required: true
+            required: true,
           }
         }
       }
@@ -351,12 +350,12 @@ server.use(restify.queryParser())
 server.use(respect.middleware)
 
 server.get({
-  path: '/'
-, version: '1.0.0'
-, params: {
+  path: '/',
+  version: '1.0.0',
+  params: {
     foo: {
-      dataTypes: 'string'
-    , default: 'bar'
+      dataTypes: 'string',
+      default: 'bar'
     }
   }
 }, function(req, res, next) {
@@ -364,9 +363,9 @@ server.get({
 })
 
 server.get({
-  path: '/'
-, version: '2.0.0'
-, params: {}
+  path: '/',
+  version: '2.0.0',
+  params: {}
 }, function(req, res, next) {
   res.send(200)
 })
@@ -555,8 +554,8 @@ the previously defined parameters.
 ```js
 const params = instance.getMergedParams('/', '2.0.0', {
   pagesize: {
-    dataTypes: 'number'
-  , description: 'Page size'
+    dataTypes: 'number',
+    description: 'Page size'
   }
 })
 ```
