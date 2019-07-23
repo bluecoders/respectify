@@ -24,15 +24,15 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "npm run hint; ./node_modules/mocha/bin/mocha -R spec test.js",
-    "hint": "./node_modules/jshint/bin/jshint ./"
+    "test": "example/server.js"
   },
   "dependencies": {
     "debug": "^2.1.1",
-    "eslint": "^4.19.1",
-    "eslint-config-bluecoders": "^1.0.5",
+    "eslint": "^6.1.0",
+    "eslint-config-bluecoders": "^1.0.13",
+    "eslint-plugin-node": "^9.1.0",
     "lodash": "^3.5.0",
-    "restify-errors": "^6.0.0",
+    "restify-errors": "^8.0.0",
     "semver": "^4.3.3",
     "var-type": "^1.0.0"
   }
