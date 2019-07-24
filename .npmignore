@@ -1,4 +1,3 @@
-# OS or Editor folders
 .DS_Store
 .cache
 .project
@@ -6,6 +5,6 @@
 nbproject
 thumbs.db
 
-# Folders to ignore
-node_modules
 .idea/
+.eslintrc
+node_modules/
